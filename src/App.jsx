@@ -170,7 +170,7 @@ export default function App() {
       <header className="header">
         <button className="burger" onClick={() => setMenu(!menu)} aria-label="Menú">☰</button>
         <a href="#top" className="brand" onClick={() => go('top')}>
-          <img src="/logo.jpg" alt="LeonFit" />
+          <img src={`${import.meta.env.BASE_URL}logo.jpg`} alt="LeonFit" />
           <span>LEON<b>FIT</b></span>
         </a>
         <nav className={menu ? 'nav show' : 'nav'}>
@@ -322,7 +322,7 @@ export default function App() {
         </section>
 
         <section className="section about" id="nosotros">
-          <div className="about-logo"><img src="/logo.jpg" alt="Logo LeonFit" /></div>
+          <div className="about-logo"><img src={`${import.meta.env.BASE_URL}logo.jpg`} alt="Logo LeonFit" /></div>
           <div>
             <span className="eyebrow">Por qué LeonFit</span>
             <h2>Rendimiento real,<br />precio de manada.</h2>
@@ -356,7 +356,7 @@ export default function App() {
 
       <footer className="footer">
         <div>
-          <img src="/logo.jpg" alt="" />
+          <img src={`${import.meta.env.BASE_URL}logo.jpg`} alt="" />
           <p>LeonFit — Sports Supplement Store.<br />Tu tienda de suplementos deportivos.</p>
         </div>
         <div><b>Tienda</b>{CATEGORIES.slice(0, 4).map((c) => <a key={c.id} onClick={() => filterTo(c.id)}>{c.name}</a>)}</div>
