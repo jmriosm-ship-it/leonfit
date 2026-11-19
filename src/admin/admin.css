@@ -138,3 +138,40 @@
 .ad,.ad-login{--bg:#050505;--bg2:#0d0d0d;--card:#111;--line:#232019;--txt:#f4efe6;--mut:#a39d8f;--gold:#c9a15a;--gold2:#e8c47c;--gold3:#8f6e32;color:var(--txt)}
 .ad input::placeholder,.ad textarea::placeholder,.ad-login input::placeholder{color:#7d786b}
 .ad h1,.ad h2,.ad h3,.ad-login h1{font-family:var(--f);font-weight:900;color:var(--txt)}
+
+/* ===== Panel con fondo blanco ===== */
+.ad,.ad-login{--bg:#fff;--bg2:#f3f4f6;--card:#fff;--line:#e4e6ea;--txt:#0f1115;--mut:#5d6470;--gold:#b98a2e;--gold2:#d9b062;--gold3:#8f6e32;color:var(--txt)}
+.ad{background:#f4f5f7}
+.ad input,.ad select,.ad textarea{background:#fff;border-color:#d5d8de;color:#111}
+.ad input::placeholder,.ad textarea::placeholder,.ad-login input::placeholder{color:#98a0ab}
+.ad-top{background:#fff;border-bottom:1px solid var(--line)}
+.ad-mode{color:#b9770e}.ad-mode.on{color:#1d8f52}
+.ad-btn{background:#fff;border-color:#d5d8de;color:#111}
+.ad-btn:hover{border-color:var(--gold);color:#7a5a14}
+.ad-btn.gold{background:linear-gradient(135deg,var(--gold2),var(--gold));color:#111;border-color:transparent}
+.ad-btn.gold:hover{color:#111}
+.ad-btn.danger{color:#c62d25;border-color:#f0c4c1}
+.ad-btn.danger:hover{background:#fdecea;border-color:#c62d25;color:#a3221b}
+.ad-tabs{background:#fff;border-bottom:1px solid var(--line)}
+.ad-tabs button:hover{color:#111}
+.ad-tabs button.on{color:#111;border-color:var(--gold)}
+.ad-card{background:#fff;border-color:var(--line)}
+.ad-pic{background:#f1f2f4}
+.ad-chips button{border-color:#d5d8de;background:#fff}
+.ad-chips button.on{background:var(--gold);border-color:var(--gold);color:#111}
+.ad-table td{border-bottom:1px solid #eef0f3}
+.ad-table td s{color:#8a909b}
+.pill{background:#f6ecd4;color:#7a5a14}
+.pill.gold{background:var(--gold);color:#111}
+.pill.red{background:#fde8e6;color:#c62d25}
+.pill.gray{background:#eceef1;color:#5d6470}
+.ad-err{color:#c62d25}
+.ad-hint.ok{color:#1d8f52}
+.ad-pick label{border-color:#d5d8de;background:#fff}
+.ad-pick label.on{border-color:var(--gold);background:#fbf5e6}
+.ad-combo-prev{background:#f6f7f9;border-color:var(--gold)}
+.ad-combo-prev .save{color:#1d8f52}
+.ad-login{background:radial-gradient(ellipse 60% 50% at 50% 30%,rgba(185,138,46,.14),transparent 70%),#f4f5f7}
+.ad-login form{background:#fff;border-color:var(--gold);box-shadow:0 30px 70px -30px rgba(0,0,0,.25)}
+.ad-login input{background:#fff;border-color:#d5d8de;color:#111}
+.ad-demo{color:#b9770e}
