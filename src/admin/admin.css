@@ -133,3 +133,8 @@
   .ad-top-r{margin-left:0;width:100%}
   .ad-table td.acts{min-width:0}
 }
+
+/* El panel es oscuro: reinicia los colores del tema claro de la tienda */
+.ad,.ad-login{--bg:#050505;--bg2:#0d0d0d;--card:#111;--line:#232019;--txt:#f4efe6;--mut:#a39d8f;--gold:#c9a15a;--gold2:#e8c47c;--gold3:#8f6e32;color:var(--txt)}
+.ad input::placeholder,.ad textarea::placeholder,.ad-login input::placeholder{color:#7d786b}
+.ad h1,.ad h2,.ad h3,.ad-login h1{font-family:var(--f);font-weight:900;color:var(--txt)}

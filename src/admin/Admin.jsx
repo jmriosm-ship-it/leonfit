@@ -33,7 +33,7 @@ function Login({ onIn }) {
         <img src={`${import.meta.env.BASE_URL}logo.jpg`} alt="LeonFit" />
         <h1>Panel de administración</h1>
         <p>Entra con tu correo y contraseña de administrador.</p>
-        <input type="email" placeholder="Correo" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} required={CLOUD} />
+        <input type={CLOUD ? 'email' : 'text'} placeholder={CLOUD ? 'Correo' : 'Correo o usuario (cualquiera)'} autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} required={CLOUD} />
         <input type="password" placeholder="Contraseña" autoComplete="current-password" value={pass} onChange={(e) => setPass(e.target.value)} required />
         {err && <p className="ad-err">{err}</p>}
         <button className="ad-btn gold" disabled={busy}>{busy ? 'Entrando…' : 'Entrar'}</button>
