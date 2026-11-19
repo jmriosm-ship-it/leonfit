@@ -2,9 +2,13 @@ import { useEffect, useMemo, useState } from 'react'
 import ProductArt from './components/ProductArt.jsx'
 import ProductPage from './components/ProductPage.jsx'
 import { Socials } from './components/Icons.jsx'
-import { CATEGORIES, COMBOS, COUPONS, FAQ, FREE_SHIPPING, PRODUCTS, WHATSAPP, money, pct } from './data.js'
+import { money, pct } from './data.js'
+import { useData } from './DataContext.jsx'
 
-const byId = (id) => PRODUCTS.find((p) => p.id === id)
+// Texto con *palabra* → palabra resaltada en dorado; salto de línea → <br>.
+const fancy = (t = '') => t.split('\n').map((line, i) => (
+  <span key={i}>{i > 0 && <br />}{line.split(/(\*[^*]+\*)/g).map((x, j) => (x.startsWith('*') && x.endsWith('*') && x.length > 2 ? <em key={j}>{x.slice(1, -1)}</em> : x))}</span>
+))
 
 function useCountdown() {
   const calc = () => {
@@ -31,9 +35,9 @@ function Card({ p, onAdd, onOpen }) {
     <article className="card">
       <div className="card-top">
         {off > 0 && <span className="off">-{off}%</span>}
-        {p.badge && <span className="badge">{p.badge}</span>}
+        {p.soldOut ? <span className="badge sold">Agotado</span> : p.badge && <span className="badge">{p.badge}</span>}
         <button className="card-art" onClick={() => onOpen(p)} aria-label={`Ver ${p.name}`}>
-          <ProductArt color={p.color} label={p.label} name={p.name} size={p.size} />
+          <ProductArt color={p.color} label={p.label} name={p.name} size={p.size} image={p.image} />
         </button>
       </div>
       <div className="card-body">
@@ -46,7 +50,7 @@ function Card({ p, onAdd, onOpen }) {
             <strong>{money(p.price)}</strong>
             {p.old && <s>{money(p.old)}</s>}
           </div>
-          <button className="btn-add" onClick={() => onAdd(p)}>Agregar</button>
+          <button className="btn-add" disabled={p.soldOut} onClick={() => onAdd(p)}>{p.soldOut ? 'Agotado' : 'Agregar'}</button>
         </div>
       </div>
     </article>
@@ -54,6 +58,22 @@ function Card({ p, onAdd, onOpen }) {
 }
 
 export default function App() {
+  const store = useData()
+  const { categories: CATEGORIES, settings } = store
+  const PRODUCTS = useMemo(() => store.products.filter((p) => !p.hidden), [store.products])
+  const COMBOS = useMemo(() => store.combos.filter((c) => c.active !== false), [store.combos])
+  const COUPONS = useMemo(() => Object.fromEntries(settings.coupons.map((c) => [String(c.code).toUpperCase(), c.pct / 100])), [settings.coupons])
+  const FREE_SHIPPING = settings.freeShipping
+  const WHATSAPP = settings.whatsapp
+  const byId = (id) => PRODUCTS.find((p) => p.id === id)
+  const maxOff = Math.max(0, ...PRODUCTS.map(pct))
+  const BASE = import.meta.env.BASE_URL
+  const phone = WHATSAPP.replace(/^57(\d{3})(\d{3})(\d{4})$/, '+57 $1 $2 $3')
+  const igHandle = (settings.instagram || '').replace(/[#?].*$/, '').split('/').filter(Boolean).pop() || ''
+  const shopCats = CATEGORIES.filter((c) => PRODUCTS.some((p) => p.cat === c.id))
+  const [shopCat, setShopCat] = useState('')
+  const shopId = shopCats.some((c) => c.id === shopCat) ? shopCat : shopCats[0]?.id
+  const shopList = PRODUCTS.filter((p) => p.cat === shopId).slice(0, 8)
   const [cart, setCart] = useState(() => {
     try { return JSON.parse(localStorage.getItem('leonfit-cart')) || [] } catch { return [] }
   })
@@ -97,17 +117,18 @@ export default function App() {
     setCart((c) => {
       const i = c.findIndex((x) => x.key === 'p' + p.id)
       if (i >= 0) return c.map((x, j) => (j === i ? { ...x, qty: x.qty + n } : x))
-      return [...c, { key: 'p' + p.id, name: p.name, sub: p.flavor, price: p.price, color: p.color, label: p.label, size: p.size, qty: n }]
+      return [...c, { key: 'p' + p.id, name: p.name, sub: p.flavor, price: p.price, color: p.color, label: p.label, size: p.size, image: p.image, qty: n }]
     })
     flash(`${p.name} agregado al carrito`)
   }
 
   const addCombo = (cb) => {
-    const items = cb.items.map(byId)
-    const price = items.reduce((a, p) => a + p.price, 0) * (1 - cb.off)
+    const items = cb.items.map(byId).filter(Boolean)
+    if (!items.length) return
+    const price = items.reduce((a, p) => a + p.price, 0) * (1 - cb.off / 100)
     setCart((c) => {
       if (c.some((x) => x.key === cb.id)) return c.map((x) => (x.key === cb.id ? { ...x, qty: x.qty + 1 } : x))
-      return [...c, { key: cb.id, name: cb.name, sub: cb.blurb, price, color: items[0].color, label: 'COMBO', size: '3 en 1', qty: 1 }]
+      return [...c, { key: cb.id, name: cb.name, sub: cb.blurb, price, color: items[0].color, label: 'COMBO', size: `${items.length} en 1`, image: items[0].image, qty: 1 }]
     })
     flash(`${cb.name} agregado`)
   }
@@ -145,7 +166,8 @@ export default function App() {
   const catInfo = CATEGORIES.find((c) => c.id === catId)
   const catTitle = catId === 'todos' ? 'Toda la tienda' : catId === 'ofertas' ? 'Ofertas 🔥' : catId === 'buscar' ? `Resultados para "${q}"` : catInfo?.name
 
-  const flashDeals = [...PRODUCTS].filter((p) => p.old).sort((a, b) => pct(b) - pct(a)).slice(0, 4)
+  const flagged = PRODUCTS.filter((p) => p.flash)
+  const flashDeals = flagged.length ? flagged : [...PRODUCTS].filter((p) => p.old).sort((a, b) => pct(b) - pct(a)).slice(0, settings.flashCount || 4)
   const go = (id) => {
     setMenu(false)
     if (window.location.hash) {
@@ -161,21 +183,34 @@ export default function App() {
         <div className="marquee">
           {[0, 1].map((k) => (
             <span key={k}>
-              🦁 ENVÍO GRATIS EN COMPRAS DESDE {money(FREE_SHIPPING)} &nbsp;•&nbsp; USA EL CUPÓN <b>LEON10</b> Y ACUMULA 10% OFF &nbsp;•&nbsp; PRODUCTOS 100% ORIGINALES &nbsp;•&nbsp; COMBOS CON HASTA 18% OFF &nbsp;•&nbsp;
+              🦁 {settings.announcement.replace('{envio}', money(FREE_SHIPPING))} &nbsp;•&nbsp;
             </span>
           ))}
         </div>
       </div>
 
       <header className="header">
-        <button className="burger" onClick={() => setMenu(!menu)} aria-label="Menú">☰</button>
-        <a href="#top" className="brand" onClick={() => go('top')}>
-          <img src={`${import.meta.env.BASE_URL}logo.jpg`} alt="LeonFit" />
-          <span>LEON<b>FIT</b></span>
-        </a>
+        <div className="hdr-top">
+          <button className="burger" onClick={() => setMenu(!menu)} aria-label="Menú">☰</button>
+          <a href="#top" className="brand" onClick={() => go('top')}>
+            <img src={`${BASE}logo.jpg`} alt="LeonFit" />
+            <span>LEON<b>FIT</b></span>
+          </a>
+          <div className="ship-to"><small>Enviar a</small><b>📍 Colombia</b></div>
+          <div className="search">
+            <input value={q} onChange={(e) => { setQ(e.target.value); if (e.target.value && catId !== 'buscar') filterTo('buscar') }} placeholder="Busca o pregúntanos: «proteína sin lactosa»" aria-label="Buscar" />
+            <button className="search-btn" aria-label="Buscar" onClick={() => q && filterTo('buscar')}>
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+            </button>
+          </div>
+          <a className="hdr-link" href={`https://wa.me/${WHATSAPP}`} target="_blank" rel="noreferrer"><small>Escríbenos por WhatsApp</small><b>{phone}</b></a>
+          <button className="cart-btn" onClick={() => setOpen(true)} aria-label="Carrito">
+            🛒<span>{count}</span><em>Carrito</em>
+          </button>
+        </div>
         <nav className={menu ? 'nav show' : 'nav'}>
           <div className="dd">
-            <a onClick={() => filterTo('todos')}>Categorías ▾</a>
+            <a onClick={() => filterTo('todos')}>Comprar todo ▾</a>
             <div className="dd-menu">
               <a onClick={() => filterTo('todos')}><b>Ver todo</b><small>Toda la tienda</small></a>
               {CATEGORIES.map((c) => (
@@ -183,17 +218,12 @@ export default function App() {
               ))}
             </div>
           </div>
-          <a onClick={() => filterTo('ofertas')} className="hot">Ofertas 🔥</a>
-          <a onClick={() => go('combos')}>Combos</a>
-          <a onClick={() => go('nosotros')}>Por qué LeonFit</a>
+          <a onClick={() => go('combos')}>Arma tu combo</a>
+          <a onClick={() => filterTo('ofertas')}>Ofertas 🔥</a>
+          <a href={`https://wa.me/${WHATSAPP}`} target="_blank" rel="noreferrer">Asesoría</a>
+          <a onClick={() => go('nosotros')}>Nosotros</a>
           <a onClick={() => go('faq')}>Preguntas</a>
         </nav>
-        <div className="search">
-          <input value={q} onChange={(e) => { setQ(e.target.value); if (e.target.value && catId !== 'buscar') filterTo('buscar') }} placeholder="Buscar proteína, creatina…" />
-        </div>
-        <button className="cart-btn" onClick={() => setOpen(true)} aria-label="Carrito">
-          🛒<span>{count}</span>
-        </button>
       </header>
 
       {route.page === 'prod' ? (
@@ -228,12 +258,12 @@ export default function App() {
         <section className="hero">
           <div className="hero-glow" />
           <div className="hero-text">
-            <span className="eyebrow">Sports Supplement Store</span>
-            <h1>Despierta<br />al <em>león</em><br />que llevas dentro.</h1>
-            <p>Proteínas, creatina y pre-entrenos 100% originales con descuentos que sí se notan. Pide por WhatsApp y recibe en casa.</p>
+            <span className="pill-tag">● {settings.heroEyebrow}</span>
+            <h1>{fancy(settings.heroTitle)}</h1>
+            <p>{settings.heroText}</p>
             <div className="hero-cta">
-              <button className="btn-gold" onClick={() => filterTo('todos')}>Comprar ahora</button>
-              <button className="btn-line" onClick={() => filterTo('ofertas')}>Ver ofertas -35%</button>
+              <button className="btn-white" onClick={() => filterTo('todos')}>Comprar ahora →</button>
+              <button className="btn-line" onClick={() => filterTo('ofertas')}>Ver ofertas{maxOff ? ` -${maxOff}%` : ''}</button>
             </div>
             <ul className="hero-stats">
               <li><b>+1.500</b>clientes felices</li>
@@ -242,11 +272,17 @@ export default function App() {
             </ul>
           </div>
           <div className="hero-art">
-            <div className="hero-ring" />
-            <div className="stack s1"><ProductArt color="#6b3a1e" label="WHEY" size="2 lb" name="Whey" /></div>
-            <div className="stack s2"><ProductArt color="#e5322b" label="PRE" size="300 g" name="Pre" /></div>
-            <div className="stack s3"><ProductArt color="#e8e8e8" label="CREA" size="300 g" name="Creatina" /></div>
-            <div className="hero-tag">-35%<small>solo hoy</small></div>
+            {settings.heroImage ? (
+              <img className="hero-img" src={settings.heroImage} alt="LeonFit" />
+            ) : (
+              <>
+                <div className="hero-ring" />
+                <div className="stack s1"><ProductArt color="#6b3a1e" label="WHEY" size="2 lb" name="Whey" /></div>
+                <div className="stack s2"><ProductArt color="#e5322b" label="PRE" size="300 g" name="Pre" /></div>
+                <div className="stack s3"><ProductArt color="#e8e8e8" label="CREA" size="300 g" name="Creatina" /></div>
+              </>
+            )}
+            <div className="hero-tag">{settings.heroTag || (maxOff ? `-${maxOff}%` : "🦁")}<small>{settings.heroTagSmall}</small></div>
           </div>
         </section>
 
@@ -258,15 +294,15 @@ export default function App() {
 
         <section className="section" id="categorias">
           <div className="head row">
-            <div><span className="eyebrow">Compra por categoría</span><h2>Elige tu categoría</h2></div>
+            <div><span className="eyebrow">Compra por categoría</span><h2>Compra por <em>categoría</em></h2></div>
           </div>
           <div className="bigcats">
-            {CATEGORIES.map((c, i) => {
+            {CATEGORIES.filter((c) => PRODUCTS.some((p) => p.cat === c.id)).map((c, i) => {
               const items = PRODUCTS.filter((p) => p.cat === c.id)
               const top = items[0]
               return (
                 <button key={c.id} className="bigcat" onClick={() => filterTo(c.id)} style={{ '--c': top.color }}>
-                  <div className="bigcat-art"><ProductArt color={top.color} label={top.label} size={top.size} name={c.name} /></div>
+                  <div className="bigcat-art"><ProductArt color={top.color} label={top.label} size={top.size} name={c.name} image={top.image} /></div>
                   <div className="bigcat-info">
                     <em>0{i + 1}</em>
                     <small>{c.tag}</small>
@@ -278,15 +314,27 @@ export default function App() {
             })}
           </div>
           <button className="offers-banner" onClick={() => filterTo('ofertas')}>
-            <span>🔥 Hasta -35%</span>
+            <span>🔥 {maxOff ? `Hasta -${maxOff}%` : 'Ofertas'}</span>
             <b>Todas las ofertas en un solo lugar</b>
             <em>Ver ofertas →</em>
           </button>
         </section>
 
+        {shopCats.length > 0 && (
+        <section className="section shop" id="tienda">
+          <div className="head"><span className="eyebrow">Catálogo</span><h2>Encuentra el suplemento ideal para tu <em>meta</em></h2></div>
+          <div className="tabs">
+            {shopCats.map((c) => <button key={c.id} className={shopId === c.id ? 'on' : ''} onClick={() => setShopCat(c.id)}>{c.name}</button>)}
+          </div>
+          <div className="grid">{shopList.map((p) => <Card key={p.id} p={p} onAdd={add} onOpen={setDetail} />)}</div>
+          <div className="center"><button className="btn-line dark" onClick={() => filterTo(shopId)}>Ver todo en {shopCats.find((c) => c.id === shopId)?.name} →</button></div>
+        </section>
+        )}
+
+        {settings.flashOn && flashDeals.length > 0 && (
         <section className="section flash">
           <div className="head row">
-            <div><span className="eyebrow">Oferta relámpago</span><h2>Se acaba hoy</h2></div>
+            <div><span className="eyebrow">Oferta relámpago</span><h2>{settings.flashTitle}</h2></div>
             <div className="timer" aria-label="Tiempo restante">
               <div><b>{h}</b>hrs</div><i>:</i><div><b>{m}</b>min</div><i>:</i><div><b>{s}</b>seg</div>
             </div>
@@ -295,19 +343,22 @@ export default function App() {
             {flashDeals.map((p) => <Card key={p.id} p={p} onAdd={add} onOpen={setDetail} />)}
           </div>
         </section>
+        )}
 
+        {COMBOS.length > 0 && (
         <section className="section" id="combos">
-          <div className="head"><span className="eyebrow">Ahorra más</span><h2>Combos con descuento extra</h2></div>
+          <div className="head"><span className="eyebrow">Ahorra más</span><h2>{settings.combosTitle}</h2></div>
           <div className="combos">
             {COMBOS.map((cb) => {
-              const items = cb.items.map(byId)
+              const items = cb.items.map(byId).filter(Boolean)
+              if (!items.length) return null
               const full = items.reduce((a, p) => a + p.price, 0)
-              const price = full * (1 - cb.off)
+              const price = full * (1 - cb.off / 100)
               return (
                 <article key={cb.id} className="combo">
-                  <span className="off">-{Math.round(cb.off * 100)}%</span>
+                  <span className="off">-{Math.round(cb.off)}%</span>
                   <div className="combo-arts">
-                    {items.map((p) => <ProductArt key={p.id} color={p.color} label={p.label} size={p.size} name={p.name} glow={false} />)}
+                    {items.map((p) => <ProductArt key={p.id} color={p.color} label={p.label} size={p.size} name={p.name} image={p.image} glow={false} />)}
                   </div>
                   <h3>{cb.name}</h3>
                   <p>{cb.blurb}</p>
@@ -320,6 +371,7 @@ export default function App() {
             })}
           </div>
         </section>
+        )}
 
         <section className="section about" id="nosotros">
           <div className="about-logo"><img src={`${import.meta.env.BASE_URL}logo.jpg`} alt="Logo LeonFit" /></div>
@@ -340,7 +392,7 @@ export default function App() {
         <section className="section" id="faq">
           <div className="head"><span className="eyebrow">Dudas</span><h2>Preguntas frecuentes</h2></div>
           <div className="faq">
-            {FAQ.map(([a, b]) => (
+            {settings.faq.map(([a, b]) => (
               <details key={a}><summary>{a}</summary><p>{b}</p></details>
             ))}
           </div>
@@ -348,7 +400,7 @@ export default function App() {
 
         <section className="cta">
           <h2>¿Listo para tu próximo nivel?</h2>
-          <p>Usa el cupón <b>LEON10</b> en tu primera compra.</p>
+          {settings.coupons[0] && <p>Usa el cupón <b>{settings.coupons[0].code}</b> en tu primera compra.</p>}
           <button className="btn-gold" onClick={() => filterTo('todos')}>Ir a la tienda</button>
         </section>
       </main>
@@ -361,7 +413,7 @@ export default function App() {
         </div>
         <div><b>Tienda</b>{CATEGORIES.slice(0, 4).map((c) => <a key={c.id} onClick={() => filterTo(c.id)}>{c.name}</a>)}</div>
         <div><b>Ayuda</b><a onClick={() => go('faq')}>Preguntas</a><a onClick={() => go('combos')}>Combos</a><a onClick={() => go('nosotros')}>Nosotros</a></div>
-        <div><b>Contacto</b><a>WhatsApp: +57 300 000 0000</a><a>Instagram y TikTok: @leonfit</a><a>Lun–Sáb · 8am–7pm</a><Socials /></div>
+        <div><b>Contacto</b><a href={`https://wa.me/${WHATSAPP}`} target="_blank" rel="noreferrer">WhatsApp: {phone}</a>{igHandle && <a href={settings.instagram} target="_blank" rel="noreferrer">Instagram: @{igHandle}</a>}<a>{settings.schedule}</a><Socials /></div>
         <small>© {new Date().getFullYear()} LeonFit. Los suplementos no sustituyen una dieta equilibrada. Consulta a tu médico.</small>
       </footer>
 
@@ -379,7 +431,7 @@ export default function App() {
           {cart.length === 0 && <p className="empty">Tu carrito está vacío. ¡Agrega algo de fuerza!</p>}
           {cart.map((x) => (
             <div className="line" key={x.key}>
-              <div className="line-art"><ProductArt color={x.color} label={x.label} size={x.size} glow={false} /></div>
+              <div className="line-art"><ProductArt color={x.color} label={x.label} size={x.size} image={x.image} glow={false} /></div>
               <div>
                 <b>{x.name}</b>
                 <small>{x.sub}</small>
@@ -394,7 +446,7 @@ export default function App() {
         {cart.length > 0 && (
           <div className="drawer-foot">
             <div className="coupon">
-              <input value={coupon} onChange={(e) => setCoupon(e.target.value)} placeholder="Cupón (prueba LEON10)" />
+              <input value={coupon} onChange={(e) => setCoupon(e.target.value)} placeholder="Cupón de descuento" />
               <button onClick={applyCoupon}>Aplicar</button>
             </div>
             <div className="sum"><span>Subtotal</span><span>{money(subtotal)}</span></div>

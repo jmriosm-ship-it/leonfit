@@ -1,16 +1,18 @@
 import { useEffect, useState } from 'react'
 import ProductArt from './ProductArt.jsx'
-import { CAT_INFO, CATEGORIES, PRODUCTS, WHATSAPP, getReviews, money, pct, ratingBars } from '../data.js'
+import { CAT_INFO, GENERIC_INFO, getReviews, money, pct, ratingBars } from '../data.js'
+import { useData } from '../DataContext.jsx'
 
 const stars = (n) => '★'.repeat(n) + '☆'.repeat(5 - n)
 
 export default function ProductPage({ p, onAdd, onBack, onOpen, onCategory }) {
+  const { categories: CATEGORIES, products: PRODUCTS, settings } = useData()
   const [qty, setQty] = useState(1)
   const [tab, setTab] = useState('desc')
   const [mine, setMine] = useState([])
   const [form, setForm] = useState({ name: '', rating: 5, text: '' })
   const key = `leonfit-reviews-${p.id}`
-  const info = CAT_INFO[p.cat]
+  const info = CAT_INFO[p.cat] || GENERIC_INFO
   const cat = CATEGORIES.find((c) => c.id === p.cat)
   const off = pct(p)
   const reviews = [...mine, ...getReviews(p)]
@@ -36,7 +38,7 @@ export default function ProductPage({ p, onAdd, onBack, onOpen, onCategory }) {
 
   const buyNow = () => {
     const msg = `Hola LeonFit 🦁, quiero comprar:\n\n• ${qty}x ${p.name} (${p.flavor}) — ${money(p.price * qty)}\n\n¿Está disponible?`
-    window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`, '_blank')
+    window.open(`https://wa.me/${settings.whatsapp}?text=${encodeURIComponent(msg)}`, '_blank')
   }
 
   return (
@@ -48,7 +50,7 @@ export default function ProductPage({ p, onAdd, onBack, onOpen, onCategory }) {
       <section className="pp-main">
         <div className="pp-gallery">
           {off > 0 && <span className="off">-{off}%</span>}
-          <ProductArt color={p.color} label={p.label} size={p.size} name={p.name} />
+          <ProductArt color={p.color} label={p.label} size={p.size} name={p.name} image={p.image} />
         </div>
 
         <div className="pp-info">
@@ -69,8 +71,8 @@ export default function ProductPage({ p, onAdd, onBack, onOpen, onCategory }) {
           <ul className="specs">
             <li><b>Sabor</b>{p.flavor}</li>
             <li><b>Presentación</b>{p.size}</li>
-            <li><b>Servicios</b>{p.servings}</li>
-            <li><b>Disponibilidad</b><span className="ok">● En stock</span></li>
+            {p.servings ? <li><b>Servicios</b>{p.servings}</li> : null}
+            <li><b>Disponibilidad</b>{p.soldOut ? <span className="no">● Agotado</span> : <span className="ok">● En stock</span>}</li>
           </ul>
 
           <div className="pp-buy">
@@ -84,7 +86,7 @@ export default function ProductPage({ p, onAdd, onBack, onOpen, onCategory }) {
           <button className="btn-line wide" onClick={buyNow}>Comprar por WhatsApp</button>
 
           <ul className="pp-perks">
-            <li>🚚 Envío gratis en compras desde $180.000</li>
+            <li>🚚 Envío gratis en compras desde {money(settings.freeShipping)}</li>
             <li>✔ Producto 100% original</li>
             <li>💬 Asesoría gratis por WhatsApp</li>
           </ul>
@@ -172,7 +174,7 @@ export default function ProductPage({ p, onAdd, onBack, onOpen, onCategory }) {
             <article className="card" key={r.id}>
               <div className="card-top">
                 {pct(r) > 0 && <span className="off">-{pct(r)}%</span>}
-                <button className="card-art" onClick={() => onOpen(r)} aria-label={`Ver ${r.name}`}><ProductArt color={r.color} label={r.label} size={r.size} name={r.name} /></button>
+                <button className="card-art" onClick={() => onOpen(r)} aria-label={`Ver ${r.name}`}><ProductArt color={r.color} label={r.label} size={r.size} name={r.name} image={r.image} /></button>
               </div>
               <div className="card-body">
                 <small>{r.brand} · {r.size}</small>

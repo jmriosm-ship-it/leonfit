@@ -1,14 +1,31 @@
-// Datos de ejemplo: cambiar por el catálogo real del local.
-export const WHATSAPP = '573000000000'
-export const SOCIAL = {
-  whatsapp: `https://wa.me/${WHATSAPP}`,
-  instagram: 'https://instagram.com/leonfit',
-  tiktok: 'https://tiktok.com/@leonfit',
+// Datos iniciales de la tienda. El panel de admin (#/admin) los reemplaza y los guarda.
+// Para cambiar el catálogo usa el panel, no este archivo.
+const SETTINGS = {
+  whatsapp: '573214580943',
+  instagram: 'https://www.instagram.com/leonfit_suplementos/',
+  tiktok: '',
+  freeShipping: 180000,
+  coupons: [{ code: 'LEON10', pct: 10 }, { code: 'FIT15', pct: 15 }],
+  announcement: 'ENVÍO GRATIS EN COMPRAS DESDE {envio} • USA EL CUPÓN LEON10 Y ACUMULA 10% OFF • PRODUCTOS 100% ORIGINALES • COMBOS CON HASTA 18% OFF',
+  heroEyebrow: 'Sports Supplement Store',
+  heroTitle: 'Despierta\nal *león*\nque llevas dentro.',
+  heroText: 'Proteínas, creatina y pre-entrenos 100% originales con descuentos que sí se notan. Pide por WhatsApp y recibe en casa.',
+  heroTag: '',
+  heroTagSmall: 'solo hoy',
+  flashOn: true,
+  flashTitle: 'Se acaba hoy',
+  flashCount: 4,
+  combosTitle: 'Combos con descuento extra',
+  schedule: 'Lun–Sáb · 8am–7pm',
+  faq: [
+    ['¿Los productos son originales?', 'Sí. Trabajamos solo con proveedores autorizados y todos los productos tienen registro sanitario y lote verificable.'],
+    ['¿Cuánto tarda el envío?', 'En la ciudad entregamos el mismo día o al siguiente. A nivel nacional de 2 a 5 días hábiles.'],
+    ['¿Cómo pago?', 'Por transferencia, Nequi, Daviplata, tarjeta o contra entrega según la zona. Confirmamos todo por WhatsApp.'],
+    ['¿No sé cuál producto elegir?', 'Escríbenos por WhatsApp y un asesor te recomienda según tu objetivo y presupuesto.'],
+  ],
 }
-export const FREE_SHIPPING = 180000
-export const COUPONS = { LEON10: 0.1, FIT15: 0.15 }
 
-export const CATEGORIES = [
+const CATEGORIES = [
   { id: 'proteinas', name: 'Proteínas', tag: 'Músculo' },
   { id: 'creatina', name: 'Creatina', tag: 'Fuerza' },
   { id: 'preentreno', name: 'Pre-entreno', tag: 'Energía' },
@@ -18,7 +35,7 @@ export const CATEGORIES = [
 ]
 
 // color = acento del empaque, label = texto corto en el pote
-export const PRODUCTS = [
+const PRODUCTS = [
   { id: 1, name: 'Whey Gold Standard', brand: 'LeonFit Lab', cat: 'proteinas', price: 189000, old: 235000, flavor: 'Chocolate Intenso', size: '2 lb', servings: 30, color: '#6b3a1e', label: 'WHEY', badge: 'Más vendido', rating: 4.9, reviews: 312, desc: '24 g de proteína por servicio, absorción rápida y mezcla sin grumos.' },
   { id: 2, name: 'Isolate Zero Carb', brand: 'LeonFit Lab', cat: 'proteinas', price: 249000, old: 295000, flavor: 'Vainilla Francesa', size: '2 lb', servings: 29, color: '#c9a15a', label: 'ISO', badge: 'Premium', rating: 4.8, reviews: 187, desc: 'Aislada al 90%, cero azúcar y baja en lactosa.' },
   { id: 3, name: 'Mass Gainer 5000', brand: 'Titan', cat: 'proteinas', price: 159000, old: 199000, flavor: 'Fresa Cream', size: '6 lb', servings: 20, color: '#b3263e', label: 'MASS', badge: null, rating: 4.6, reviews: 94, desc: '1.100 calorías por servicio para quienes cuesta ganar peso.' },
@@ -33,18 +50,20 @@ export const PRODUCTS = [
   { id: 12, name: 'Omega 3 Ultra', brand: 'LeonFit Lab', cat: 'vitaminas', price: 72000, old: null, flavor: '100 softgels', size: '100 sg', servings: 50, color: '#2fb36b', label: 'OMEGA', badge: null, rating: 4.7, reviews: 97, desc: 'EPA y DHA de alta pureza para corazón y articulaciones.' },
 ]
 
-export const COMBOS = [
-  { id: 'c1', name: 'Combo Masa Muscular', items: [1, 4, 8], off: 0.15, blurb: 'Whey + Creatina + BCAA' },
-  { id: 'c2', name: 'Combo Definición', items: [2, 10, 11], off: 0.15, blurb: 'Isolate + Thermo X + Multivitamínico' },
-  { id: 'c3', name: 'Combo Bestia', items: [6, 4, 3], off: 0.18, blurb: 'Pre-Workout + Creatina + Mass Gainer' },
+const COMBOS = [
+  { id: 'c1', name: 'Combo Masa Muscular', items: [1, 4, 8], off: 15, blurb: 'Whey + Creatina + BCAA' },
+  { id: 'c2', name: 'Combo Definición', items: [2, 10, 11], off: 15, blurb: 'Isolate + Thermo X + Multivitamínico' },
+  { id: 'c3', name: 'Combo Bestia', items: [6, 4, 3], off: 18, blurb: 'Pre-Workout + Creatina + Mass Gainer' },
 ]
 
-export const FAQ = [
-  ['¿Los productos son originales?', 'Sí. Trabajamos solo con proveedores autorizados y todos los productos tienen registro sanitario y lote verificable.'],
-  ['¿Cuánto tarda el envío?', 'En la ciudad entregamos el mismo día o al siguiente. A nivel nacional de 2 a 5 días hábiles.'],
-  ['¿Cómo pago?', 'Por transferencia, Nequi, Daviplata, tarjeta o contra entrega según la zona. Confirmamos todo por WhatsApp.'],
-  ['¿No sé cuál producto elegir?', 'Escríbenos por WhatsApp y un asesor te recomienda según tu objetivo y presupuesto.'],
-]
+export const DEFAULT_DATA = { settings: SETTINGS, categories: CATEGORIES, products: PRODUCTS, combos: COMBOS }
+
+// Texto genérico para categorías creadas desde el panel.
+export const GENERIC_INFO = {
+  benefits: ['Producto 100% original', 'Calidad verificada por LeonFit', 'Asesoría gratis por WhatsApp', 'Envío rápido a todo el país'],
+  usage: 'Sigue las indicaciones de la etiqueta. Si tienes dudas, escríbenos por WhatsApp y te asesoramos.',
+  nutrition: [['Porción', 'Ver etiqueta'], ['Calorías', 'Ver etiqueta']],
+}
 
 export const money = (n) => '$' + Math.round(n).toLocaleString('es-CO')
 export const pct = (p) => (p.old ? Math.round((1 - p.price / p.old) * 100) : 0)

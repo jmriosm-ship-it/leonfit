@@ -1,6 +1,7 @@
 // Pote de suplemento dibujado en SVG (reemplazable por fotos reales).
-export default function ProductArt({ color = '#c9a15a', label = 'LEON', name = '', size = '', glow = true }) {
-  const id = `g${color.replace('#', '')}${label}`
+export default function ProductArt({ color = '#c9a15a', label = 'LEON', name = '', size = '', glow = true, image = '' }) {
+  if (image) return <img src={image} alt={name} className="art art-img" loading="lazy" />
+  const id = `g${color.replace('#', '')}${label}`.replace(/\W/g, '')
   return (
     <svg viewBox="0 0 200 240" className="art" role="img" aria-label={name}>
       <defs>
@@ -14,6 +15,7 @@ export default function ProductArt({ color = '#c9a15a', label = 'LEON', name = '
           <stop offset="0" stopColor={color} stopOpacity=".55" />
           <stop offset="1" stopColor={color} stopOpacity="0" />
         </radialGradient>
+        <clipPath id={id+'c'}><path d="M38 56h124l6 20v132a14 14 0 0 1-14 14H46a14 14 0 0 1-14-14V76z" /></clipPath>
       </defs>
       {glow && <circle cx="100" cy="125" r="100" fill={`url(#${id}r)`} />}
       <ellipse cx="100" cy="226" rx="62" ry="8" fill="#000" opacity=".6" />
@@ -25,6 +27,7 @@ export default function ProductArt({ color = '#c9a15a', label = 'LEON', name = '
       ))}
       {/* cuerpo */}
       <path d="M38 56h124l6 20v132a14 14 0 0 1-14 14H46a14 14 0 0 1-14-14V76z" fill="#101010" stroke="#2a2a2a" />
+      <g clipPath={`url(#${id}c)`}>
       <rect x="32" y="84" width="136" height="104" fill={color} />
       <rect x="32" y="84" width="136" height="104" fill="#000" opacity=".28" />
       <rect x="32" y="84" width="136" height="3" fill="#c9a15a" />
@@ -41,6 +44,7 @@ export default function ProductArt({ color = '#c9a15a', label = 'LEON', name = '
         {size.toUpperCase()}
       </text>
       <rect x="32" y="56" width="136" height="164" fill={`url(#${id})`} opacity=".7" />
+      </g>
     </svg>
   )
 }

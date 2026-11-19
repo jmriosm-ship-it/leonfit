@@ -19,13 +19,15 @@ export const TikTokIcon = (props) => (
 )
 
 export function Socials({ className = '' }) {
+  const { settings } = useData()
+  const SOCIAL = { whatsapp: `https://wa.me/${settings.whatsapp}`, instagram: settings.instagram, tiktok: settings.tiktok }
   return (
     <div className={`socials ${className}`}>
       <a href={SOCIAL.whatsapp} target="_blank" rel="noreferrer" aria-label="WhatsApp" className="wa-i"><WhatsAppIcon /></a>
       <a href={SOCIAL.instagram} target="_blank" rel="noreferrer" aria-label="Instagram" className="ig-i"><InstagramIcon /></a>
-      <a href={SOCIAL.tiktok} target="_blank" rel="noreferrer" aria-label="TikTok" className="tt-i"><TikTokIcon /></a>
+      {SOCIAL.tiktok && <a href={SOCIAL.tiktok} target="_blank" rel="noreferrer" aria-label="TikTok" className="tt-i"><TikTokIcon /></a>}
     </div>
   )
 }
 
-import { SOCIAL } from '../data.js'
+import { useData } from '../DataContext.jsx'

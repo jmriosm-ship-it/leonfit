@@ -363,3 +363,9 @@ details p{color:var(--mut);margin-top:12px}
 @keyframes pulse{50%{box-shadow:0 0 0 14px rgba(37,211,102,0)}}
 
 @media (max-width:860px){.socials.float{bottom:80px}.socials.float a{width:48px;height:48px}.socials.float .wa-i{width:56px;height:56px}}
+
+/* Extras del panel de admin */
+.art-img{object-fit:contain}
+.badge.sold{background:#333;color:#ddd}
+.btn-add:disabled{opacity:.45;cursor:not-allowed}
+.ok{color:var(--ok)}.no{color:#ff7a72}

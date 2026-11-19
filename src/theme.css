@@ -1,0 +1,190 @@
+/* Tema LeonFit v2 — estructura tipo tienda grande: header negro + barra de navegación,
+   portada oscura con foto, secciones claras y tarjetas grises. El color de acento es --gold:
+   cámbialo aquí (por ejemplo a un azul) y toda la tienda lo sigue. */
+:root{
+  --bg:#fff;--bg2:#f3f4f6;--card:#f1f2f4;--line:#e4e6ea;
+  --txt:#0f1115;--mut:#5d6470;
+  --gold:#b98a2e;--gold2:#d9b062;--gold3:#8f6e32;
+  --display:'Anton','Archivo Narrow',Impact,sans-serif;--serif:'Playfair Display',Georgia,serif;
+}
+/* Zonas oscuras: reinician las variables para que su contenido siga en modo oscuro */
+.announce,.header,.hero,.bigcat,.combo,.cta,.footer,.pp-sticky{
+  --bg:#050505;--bg2:#0d0d0d;--card:#111;--line:#232019;--txt:#f4efe6;--mut:#a39d8f;
+  --gold:#c9a15a;--gold2:#e8c47c;--gold3:#8f6e32;color:var(--txt)
+}
+body{background:#fff;color:var(--txt)}
+
+/* tipografía de títulos */
+.hero h1,.head h2,.about h2,.cta h2,.pp-info h1,.combo h3,.bigcat-info b,.drawer-head h3,.pp-panel h3{font-family:var(--display);font-weight:400;letter-spacing:.01em}
+.hero h1 em,.head h2 em,.about h2 em,.cta h2 em{font-family:var(--serif);font-style:italic;font-weight:500;text-transform:none;color:var(--gold);background:none;-webkit-text-fill-color:currentColor;letter-spacing:0}
+.eyebrow{color:var(--gold3)}
+.hero .eyebrow,.cta .eyebrow{color:var(--gold)}
+
+/* anuncio */
+.announce{background:#000;color:#e9e3d5;border-bottom:1px solid #1c1a14}
+.announce b{color:var(--gold)}
+
+/* header en dos filas */
+.header{display:block;padding:0;background:#050505;border-bottom:0;backdrop-filter:none}
+.hdr-top{display:flex;align-items:center;gap:20px;padding:10px 4vw}
+.ship-to{display:grid;line-height:1.15;font-size:13px}
+.ship-to small{color:var(--mut);font-size:11px}
+.search{flex:1;max-width:640px;margin:0;position:relative;display:flex}
+.search input{width:100%;background:#fff;color:#111;border:2px solid #fff;border-radius:99px;padding:11px 54px 11px 18px;font-size:14px}
+.search input:focus{border-color:var(--gold)}
+.search input::placeholder{color:#7a7f88}
+.search-btn{position:absolute;right:4px;top:4px;bottom:4px;width:42px;border-radius:99px;background:var(--gold);color:#111;display:grid;place-items:center}
+.hdr-link{display:grid;line-height:1.15;font-size:14px;white-space:nowrap;margin-left:auto}
+.hdr-link small{color:var(--mut);font-size:11px}
+.cart-btn{display:flex;align-items:center;gap:6px;font-size:22px;padding:6px 8px}
+.cart-btn em{font:800 14px var(--f);font-style:normal}
+.cart-btn span{top:-2px;right:auto;left:20px}
+.nav{background:var(--gold);margin:0;padding:0 4vw;gap:6px;color:#111}
+.nav>a,.dd>a{color:#111;padding:13px 14px;display:block;font:800 13px var(--fn);letter-spacing:.08em}
+.nav>a:hover,.dd>a:hover{background:rgba(0,0,0,.12);color:#000}
+.nav .hot{color:#111}
+.dd-menu{left:0;top:100%;border-radius:0 0 12px 12px;border-color:#2a2619}
+.dd-menu a{color:var(--txt);padding:10px 12px}
+
+/* botones */
+.btn-add{background:#111;color:#fff;border-radius:99px;padding:9px 18px}
+.btn-add:hover{background:var(--gold);color:#111}
+.btn-white{background:#fff;color:#111;border-radius:6px;padding:15px 28px;font:800 14px var(--f);letter-spacing:.04em;text-transform:uppercase;transition:.2s}
+.btn-white:hover{background:var(--gold2);transform:translateY(-2px)}
+.btn-line.dark{border-color:#111;color:#111}
+.btn-line.dark:hover{background:#111;color:#fff}
+.center{text-align:center;margin-top:34px}
+
+/* portada */
+.hero{background:#050505;grid-template-columns:1.05fr .95fr;min-height:600px;padding:64px 4vw}
+.hero-glow{background:radial-gradient(ellipse 45% 70% at 80% 50%,rgba(201,161,90,.22),transparent 70%)}
+.pill-tag{display:inline-flex;align-items:center;gap:8px;background:#0f0f10;border:1px solid #2c2a22;color:#cfc8b8;font:700 11px var(--fn);letter-spacing:.2em;text-transform:uppercase;padding:7px 14px;border-radius:99px}
+.hero h1{font-size:clamp(50px,7vw,104px);line-height:.98;margin:20px 0 18px}
+.hero-tag{box-shadow:0 0 0 5px #050505,0 0 0 7px var(--red);right:6%;top:6%}
+.hero-img{width:100%;height:100%;object-fit:cover;border-radius:22px;border:1px solid #2a2619}
+.hero-stats b{color:var(--gold2)}
+
+/* franja de confianza */
+.trust{background:#fff;border-block:1px solid var(--line);gap:0}
+.trust div{background:#fff;border-right:1px solid var(--line);color:var(--txt)}
+.trust div:last-child{border-right:0}
+.trust small{color:var(--mut)}
+
+/* secciones claras */
+.section{background:#fff}
+.head h2{font-size:clamp(34px,5vw,60px);text-transform:uppercase;line-height:1}
+.shop{background:#f6f7f9}
+.flash{background:#f6f7f9;border-block:1px solid var(--line)}
+.tabs{display:flex;gap:30px;border-bottom:1px solid var(--line);margin-bottom:28px;overflow-x:auto}
+.tabs button{padding:12px 2px;font:800 15px var(--fn);letter-spacing:.1em;text-transform:uppercase;color:var(--mut);border-bottom:3px solid transparent;white-space:nowrap}
+.tabs button:hover{color:#111}
+.tabs button.on{color:#111;border-color:#111}
+.chip{border-color:var(--line);color:var(--mut);background:#fff}
+.chip:hover{border-color:#111;color:#111}
+.chip.on{background:#111;border-color:#111;color:#fff}
+select{background:#fff;color:#111;border-color:var(--line)}
+.timer div{background:#111;border-color:#111;color:#bdb6a6}
+.timer b{color:var(--gold2)}
+.timer i{color:#111}
+
+/* tarjetas de producto */
+.card{background:#fff;border:1px solid var(--line);border-radius:18px}
+.card:hover{border-color:#111;box-shadow:0 24px 50px -30px rgba(0,0,0,.45)}
+.card-top{background:#f1f2f4;padding:20px}
+.card-body{background:#fff}
+.price-row strong{color:#111}
+.price-row s{color:#8a909b}
+.badge{background:#111;color:#fff;border:0}
+.badge.sold{background:#555}
+.stars{color:#e0a43a}
+.stars i{color:#d3d6db}
+.stars b{color:var(--mut)}
+
+/* categorías y combos (tarjetas oscuras sobre fondo claro) */
+.bigcat{border-color:#1c1a14;color:var(--txt)}
+.bigcat-info small{color:var(--gold)}
+.combo{color:var(--txt)}
+.combo p{color:var(--mut)}
+.combo .price-row strong{color:var(--gold2)}
+.combo .price-row s{color:var(--mut)}
+.combo .btn-add{background:var(--gold);color:#111}
+.offers-banner{color:#fff}
+
+/* nosotros / preguntas / cta */
+.about{background:#f6f7f9;border-color:var(--line)}
+.about p{color:var(--mut)}
+.about-logo img{box-shadow:0 30px 70px -30px rgba(0,0,0,.35)}
+details{background:#f6f7f9;border-color:var(--line)}
+details[open]{border-color:#111}
+summary::after{color:#111}
+.cta{background:radial-gradient(ellipse at center,rgba(201,161,90,.22),transparent 70%),#050505;color:var(--txt)}
+.footer{background:#050505;border-top:0}
+.footer a:hover{color:var(--gold2)}
+
+/* página de producto y categoría */
+.crumbs a:hover{color:#000;text-decoration:underline}
+.pp-gallery{background:#f1f2f4;border-color:var(--line)}
+.pp-price strong{color:#111}
+.pp-price s{color:#8a909b}
+.pp-brand,.nut th,.pp-info .specs b{color:var(--gold3)}
+.pp-panel{background:#fff;border-color:var(--line)}
+.note{color:#8a909b}
+.rev-bars i{background:#e4e6ea}
+.rev-score b{color:#111}
+.rev-form input,.rev-form textarea{background:#fff;color:#111}
+.qty button{border-color:var(--line)}
+.qty button:hover{border-color:#111}
+.pp-sticky{background:rgba(5,5,5,.96);border-top:1px solid var(--gold3)}
+.pp-sticky span{color:var(--gold2)}
+
+/* carrito */
+.drawer{background:#fff;border-left:1px solid var(--line)}
+.drawer-bg{background:rgba(0,0,0,.55)}
+.line-art{background:#f1f2f4}
+.bar{background:#e4e6ea}
+.coupon input{background:#fff;color:#111;border-color:var(--gold)}
+.coupon button{background:#111;color:#fff}
+.sum.big{color:#111}
+.toast{background:#111;color:#fff}
+
+/* responsive */
+@media(max-width:1100px){.ship-to{display:none}.hdr-link small{display:none}}
+@media(max-width:860px){
+  .hdr-top{flex-wrap:wrap;gap:10px 14px;padding:10px 4vw}
+  .brand{margin-right:auto}
+  .hdr-link{display:none}
+  .search{order:9;flex-basis:100%;max-width:none}
+  .nav{padding:0}
+  .nav>a,.dd>a{padding:16px 4vw;border-top:1px solid rgba(0,0,0,.15)}
+  .nav,.dd-menu{background:#111}
+  .nav>a,.dd>a{color:#f4efe6}
+  .pp-gallery{position:relative}
+  .hero{grid-template-columns:1fr;padding:40px 4vw}
+  .hero-art{height:380px}
+  .hero-tag{right:8px;top:8px;width:84px;height:84px;font-size:24px}
+  .trust div{border-right:0;border-bottom:1px solid var(--line)}
+}
+@media(max-width:560px){
+  .cart-btn em{display:none}
+  .brand span{display:inline}
+  .hero h1{font-size:clamp(44px,13vw,64px)}
+  .tabs{gap:20px}
+}
+
+/* Combos: los botes no deben salirse de su tarjeta ni tapar el título */
+.combo{overflow:hidden}
+.combo-arts{height:170px;overflow:hidden;align-items:flex-end}
+.combo-arts .art{width:auto;height:150px;max-width:32%;margin:0 -1%}
+.combo-arts .art:nth-child(2){width:auto;height:170px;margin-bottom:0}
+.combo-arts .art-img{object-fit:contain}
+
+/* Nosotros: imagen un poco más abajo y letra más grande */
+.about{align-items:start}
+.about-logo{margin-top:56px}
+.about .eyebrow{font-size:14px}
+.about h2{font-size:clamp(40px,5.4vw,70px)}
+.about p{font-size:20px;line-height:1.6;max-width:640px}
+.about .checks{gap:14px}
+.about .checks li{font-size:20px;font-weight:500}
+.about .btn-gold{font-size:16px;padding:18px 36px}
+@media(max-width:860px){.about-logo{margin-top:0}.about p,.about .checks li{font-size:17px}}
