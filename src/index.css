@@ -378,3 +378,70 @@ details p{color:var(--mut);margin-top:12px}
 .legal-tabs a.on{background:var(--gold);color:#111;border-color:var(--gold)}
 .legal h2{font-size:19px;margin:26px 0 8px}
 .legal p{color:var(--mut);margin-bottom:10px;line-height:1.7}
+
+/* ---- Página del carrito ---- */
+.cartpage{max-width:1200px;margin:0 auto;padding:36px 4vw 100px;background:#fff;color:var(--txt)}
+.cart-title{display:flex;align-items:baseline;gap:16px;margin-bottom:24px}
+.cart-title h1,.empty-cart h1{font:400 clamp(40px,6vw,72px) var(--display);text-transform:uppercase;line-height:1}
+.cart-title small{font:700 12px var(--fn);letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
+.cart-grid{display:grid;grid-template-columns:1fr 340px;gap:28px;align-items:start}
+.cart-items{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff;margin-bottom:24px}
+.cart-item{display:grid;grid-template-columns:84px 1fr auto;gap:16px;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line)}
+.cart-item:last-child{border-bottom:0}
+.cart-img{background:#f1f2f4;border-radius:10px;padding:6px;aspect-ratio:1}
+.cart-img .art{width:100%;height:100%;object-fit:contain}
+.cart-info b{display:block;font-size:15px;text-transform:uppercase}
+.cart-info small{display:block;color:var(--mut);font-size:13px}
+.cart-side{display:grid;justify-items:end;gap:6px}
+.cart-side .qty{margin:0;border:1px solid #111;border-radius:6px;gap:0}
+.cart-side .qty button{border:0;width:32px;height:32px;font-size:18px}
+.cart-side .qty span{min-width:30px;text-align:center;font-weight:800}
+.cart-side strong{font-size:16px}
+.link-btn{font:700 11px var(--fn);letter-spacing:.14em;text-transform:uppercase;text-decoration:underline;color:var(--mut)}
+.link-btn:hover{color:#111}
+
+.checkout{border:1px solid var(--line);border-radius:14px;padding:26px;background:#fff}
+.checkout h2{font:400 clamp(30px,4vw,44px) var(--display);text-transform:uppercase;line-height:1}
+.checkout .sub{color:var(--mut);margin:6px 0 20px}
+.f-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.f-grid label{display:grid;gap:6px;font:700 11px var(--fn);letter-spacing:.14em;text-transform:uppercase;align-content:start}
+.f-grid label.wide{grid-column:1/-1}
+.f-grid em{font-style:normal;text-transform:none;letter-spacing:0;color:var(--mut);font-weight:500}
+.f-grid input,.f-grid select,.f-grid textarea{width:100%;background:#fff;color:#111;border:1px solid #cfd3d9;border-radius:8px;padding:12px 14px;font:500 15px var(--f);letter-spacing:0;text-transform:none;outline:0}
+.f-grid input:focus,.f-grid select:focus,.f-grid textarea:focus{border-color:#111}
+.f-grid textarea{resize:vertical}
+.f-err{color:#c8261e;font:600 12px var(--f);letter-spacing:0;text-transform:none}
+.f-err.block{display:block;margin-top:10px}
+.f-consent{margin-top:18px;display:grid;gap:6px}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--mut);cursor:pointer}
+.check input{width:18px;height:18px;margin-top:3px;accent-color:#111;flex:none}
+.check a{text-decoration:underline;color:#111}
+
+.cart-sum{position:sticky;top:20px;border:2px solid #111;border-radius:6px;padding:22px;background:#fff;display:grid;gap:10px}
+.cart-sum h2{font:400 32px var(--display);text-transform:uppercase;line-height:1}
+.cart-sum .ship{padding:0 0 6px;border:0}
+.cart-sum .coupon{margin:2px 0 4px}
+.cart-sum .sum{padding:8px 0;border-bottom:1px solid var(--line)}
+.cart-sum .sum.big{border:0;align-items:baseline;font:400 34px var(--display)}
+.cart-sum .sum.big span:first-child{font:800 12px var(--fn);letter-spacing:.14em;text-transform:uppercase}
+.btn-black{background:#111;color:#fff;padding:16px 24px;font:800 13px var(--f);letter-spacing:.1em;text-transform:uppercase;border-radius:4px;transition:.2s}
+.btn-black:hover{background:var(--gold3)}
+.btn-black.wide{width:100%}
+.fine{font-size:12px;color:var(--mut);line-height:1.5}
+.cart-sum .link-btn{justify-self:center;margin-top:4px}
+
+.empty-cart{text-align:center;padding:110px 4vw 130px}
+.empty-cart p{color:var(--mut);margin:14px 0 26px;font-size:17px}
+.dark-btn{display:inline-block;margin-top:14px;background:#111;color:#fff}
+
+@media(max-width:900px){
+  .cart-grid{grid-template-columns:1fr}
+  .cart-sum{position:static;order:-1}
+}
+@media(max-width:560px){
+  .cart-item{grid-template-columns:64px 1fr}
+  .cart-side{grid-column:1/-1;grid-template-columns:auto 1fr auto;align-items:center;justify-items:start;gap:12px}
+  .cart-side strong{justify-self:end}
+  .f-grid{grid-template-columns:1fr}
+  .checkout{padding:18px}
+}

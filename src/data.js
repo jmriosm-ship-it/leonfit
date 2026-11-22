@@ -4,9 +4,9 @@ const SETTINGS = {
   whatsapp: '573214580943',
   instagram: 'https://www.instagram.com/leonfit_suplementos/',
   tiktok: 'https://www.tiktok.com/@leonfit_suplementos',
-  freeShipping: 180000,
-  coupons: [{ code: 'LEON10', pct: 10 }, { code: 'FIT15', pct: 15 }],
-  announcement: 'ENVÍO GRATIS EN COMPRAS DESDE {envio} • USA EL CUPÓN LEON10 Y ACUMULA 10% OFF • PRODUCTOS 100% ORIGINALES • COMBOS CON HASTA 18% OFF',
+  freeShipping: 0, // 0 = sin envío gratis (se cambia en el panel)
+  coupons: [],
+  announcement: 'ENVÍOS A TODA COLOMBIA • PIDE POR WHATSAPP • ASESORÍA PERSONALIZADA',
   heroEyebrow: 'Sports Supplement Store',
   heroTitle: 'Despierta\nal *león*\nque llevas dentro.',
   heroText: 'Proteínas, creatina y pre-entrenos 100% originales con descuentos que sí se notan. Pide por WhatsApp y recibe en casa.',
@@ -18,10 +18,10 @@ const SETTINGS = {
   combosTitle: 'Combos con descuento extra',
   schedule: 'Lun–Sáb 9am–5pm · Festivos 9am–12pm',
   faq: [
-    ['¿Los productos son originales?', 'Sí. Trabajamos solo con proveedores autorizados y todos los productos tienen registro sanitario y lote verificable.'],
-    ['¿Cuánto tarda el envío?', 'En la ciudad entregamos el mismo día o al siguiente. A nivel nacional de 2 a 5 días hábiles.'],
-    ['¿Cómo pago?', 'Por transferencia, Nequi, Daviplata, tarjeta o contra entrega según la zona. Confirmamos todo por WhatsApp.'],
-    ['¿No sé cuál producto elegir?', 'Escríbenos por WhatsApp y un asesor te recomienda según tu objetivo y presupuesto.'],
+    ['¿A qué ciudades envían?', 'Enviamos a toda Colombia por transportadora. Te confirmamos el tiempo y el costo del envío antes de que pagues.'],
+    ['¿Cómo hago mi pedido y cómo pago?', 'Armas tu carrito, llenas tus datos de entrega y te llega el pedido listo a nuestro WhatsApp. Allí confirmamos disponibilidad y el pago por Nequi, Credicervir o Bancolombia.'],
+    ['¿Cuál es el horario de atención?', 'Lunes a sábado de 9:00 a. m. a 5:00 p. m. Los festivos de 9:00 a. m. a 12:00 m. y los domingos no hay servicio.'],
+    ['¿No sé cuál producto elegir?', 'Escríbenos por WhatsApp y un asesor te recomienda según tu objetivo.'],
   ],
 }
 
@@ -35,26 +35,9 @@ const CATEGORIES = [
 ]
 
 // color = acento del empaque, label = texto corto en el pote
-const PRODUCTS = [
-  { id: 1, name: 'Whey Gold Standard', brand: 'LeonFit Lab', cat: 'proteinas', price: 189000, old: 235000, flavor: 'Chocolate Intenso', size: '2 lb', servings: 30, color: '#6b3a1e', label: 'WHEY', badge: 'Más vendido', rating: 4.9, reviews: 312, desc: '24 g de proteína por servicio, absorción rápida y mezcla sin grumos.' },
-  { id: 2, name: 'Isolate Zero Carb', brand: 'LeonFit Lab', cat: 'proteinas', price: 249000, old: 295000, flavor: 'Vainilla Francesa', size: '2 lb', servings: 29, color: '#c9a15a', label: 'ISO', badge: 'Premium', rating: 4.8, reviews: 187, desc: 'Aislada al 90%, cero azúcar y baja en lactosa.' },
-  { id: 3, name: 'Mass Gainer 5000', brand: 'Titan', cat: 'proteinas', price: 159000, old: 199000, flavor: 'Fresa Cream', size: '6 lb', servings: 20, color: '#b3263e', label: 'MASS', badge: null, rating: 4.6, reviews: 94, desc: '1.100 calorías por servicio para quienes cuesta ganar peso.' },
-  { id: 4, name: 'Creatina Monohidrato', brand: 'LeonFit Lab', cat: 'creatina', price: 79000, old: 98000, flavor: 'Sin sabor', size: '300 g', servings: 60, color: '#e8e8e8', label: 'CREA', badge: 'Más vendido', rating: 5.0, reviews: 421, desc: 'Creapure® micronizada. 5 g por servicio, 60 servicios.' },
-  { id: 5, name: 'Creatina HCl Matrix', brand: 'Apex', cat: 'creatina', price: 119000, old: null, flavor: 'Mango Ice', size: '240 g', servings: 48, color: '#e08a1e', label: 'HCL', badge: 'Nuevo', rating: 4.7, reviews: 58, desc: 'Mayor solubilidad, sin hinchazón ni fase de carga.' },
-  { id: 6, name: 'Pre-Workout Inferno', brand: 'Apex', cat: 'preentreno', price: 129000, old: 165000, flavor: 'Sandía Fuego', size: '300 g', servings: 30, color: '#e5322b', label: 'PRE', badge: 'Explosivo', rating: 4.8, reviews: 203, desc: '300 mg de cafeína, beta-alanina y citrulina. Energía sin crash.' },
-  { id: 7, name: 'Pre-Workout Black Mamba', brand: 'Titan', cat: 'preentreno', price: 139000, old: 172000, flavor: 'Uva Venom', size: '270 g', servings: 30, color: '#7a2fd0', label: 'MAMBA', badge: null, rating: 4.7, reviews: 76, desc: 'Foco extremo y bombeo para sesiones pesadas.' },
-  { id: 8, name: 'BCAA 2:1:1 Recovery', brand: 'LeonFit Lab', cat: 'aminoacidos', price: 89000, old: 109000, flavor: 'Limón Hielo', size: '300 g', servings: 30, color: '#18b9a6', label: 'BCAA', badge: null, rating: 4.5, reviews: 112, desc: 'Reduce la fatiga y acelera la recuperación muscular.' },
-  { id: 9, name: 'EAA Complete', brand: 'Apex', cat: 'aminoacidos', price: 105000, old: null, flavor: 'Frutos Rojos', size: '350 g', servings: 35, color: '#d6336c', label: 'EAA', badge: 'Nuevo', rating: 4.6, reviews: 41, desc: 'Los 9 aminoácidos esenciales en una sola mezcla.' },
-  { id: 10, name: 'Fat Burner Thermo X', brand: 'Titan', cat: 'quemadores', price: 99000, old: 129000, flavor: '90 cápsulas', size: '90 caps', servings: 45, color: '#f2b705', label: 'THERMO', badge: 'Oferta', rating: 4.4, reviews: 88, desc: 'Termogénico con té verde, L-carnitina y cafeína.' },
-  { id: 11, name: 'Multivitamínico Elite', brand: 'LeonFit Lab', cat: 'vitaminas', price: 65000, old: 82000, flavor: '120 tabletas', size: '120 tabs', servings: 60, color: '#3d8bff', label: 'VITA', badge: null, rating: 4.6, reviews: 133, desc: '23 vitaminas y minerales para rendimiento y defensas.' },
-  { id: 12, name: 'Omega 3 Ultra', brand: 'LeonFit Lab', cat: 'vitaminas', price: 72000, old: null, flavor: '100 softgels', size: '100 sg', servings: 50, color: '#2fb36b', label: 'OMEGA', badge: null, rating: 4.7, reviews: 97, desc: 'EPA y DHA de alta pureza para corazón y articulaciones.' },
-]
+const PRODUCTS = []
 
-const COMBOS = [
-  { id: 'c1', name: 'Combo Masa Muscular', items: [1, 4, 8], off: 15, blurb: 'Whey + Creatina + BCAA' },
-  { id: 'c2', name: 'Combo Definición', items: [2, 10, 11], off: 15, blurb: 'Isolate + Thermo X + Multivitamínico' },
-  { id: 'c3', name: 'Combo Bestia', items: [6, 4, 3], off: 18, blurb: 'Pre-Workout + Creatina + Mass Gainer' },
-]
+const COMBOS = []
 
 export const DEFAULT_DATA = { settings: SETTINGS, categories: CATEGORIES, products: PRODUCTS, combos: COMBOS }
 

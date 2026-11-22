@@ -3,6 +3,7 @@ import ProductArt from './components/ProductArt.jsx'
 import ProductPage from './components/ProductPage.jsx'
 import { Socials } from './components/Icons.jsx'
 import LegalPage from './components/LegalPage.jsx'
+import CartPage from './components/CartPage.jsx'
 import { LEGAL } from './legal.js'
 import { money, pct } from './data.js'
 import { useData } from './DataContext.jsx'
@@ -79,11 +80,11 @@ export default function App() {
   const [cart, setCart] = useState(() => {
     try { return JSON.parse(localStorage.getItem('leonfit-cart')) || [] } catch { return [] }
   })
-  const [open, setOpen] = useState(false)
   const [menu, setMenu] = useState(false)
   const [sort, setSort] = useState('popular')
   const [q, setQ] = useState('')
   const readRoute = () => {
+    if (window.location.hash.startsWith('#/carrito')) return { page: 'cart' }
     const lg = window.location.hash.match(/^#\/(terminos|privacidad)/)
     if (lg) return { page: 'legal', kind: lg[1] }
     const m = window.location.hash.match(/^#\/(producto|categoria)\/([\w-]+)/)
@@ -137,6 +138,9 @@ export default function App() {
     flash(`${cb.name} agregado`)
   }
 
+  const goCart = () => { setMenu(false); window.location.hash = '/carrito' }
+  const removeItem = (key) => setCart((c) => c.filter((x) => x.key !== key))
+  const clearCart = () => { setCart([]); setApplied(null) }
   const setQty = (key, d) =>
     setCart((c) => c.map((x) => (x.key === key ? { ...x, qty: x.qty + d } : x)).filter((x) => x.qty > 0))
 
@@ -150,12 +154,6 @@ export default function App() {
     const code = coupon.trim().toUpperCase()
     if (COUPONS[code]) { setApplied(code); flash(`Cupón ${code} aplicado`) }
     else { setApplied(null); flash('Cupón no válido') }
-  }
-
-  const checkout = () => {
-    const lines = cart.map((x) => `• ${x.qty}x ${x.name} — ${money(x.price * x.qty)}`).join('\n')
-    const msg = `Hola LeonFit 🦁, quiero hacer este pedido:\n\n${lines}\n\n${applied ? `Cupón ${applied}: -${money(discount)}\n` : ''}Total: ${money(total)}${missing === 0 ? ' (envío gratis)' : ''}`
-    window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`, '_blank')
   }
 
   const catId = route.page === 'cat' ? route.id : null
@@ -208,7 +206,7 @@ export default function App() {
             </button>
           </div>
           <a className="hdr-link" href={`https://wa.me/${WHATSAPP}`} target="_blank" rel="noreferrer"><small>Escríbenos por WhatsApp</small><b>{phone}</b></a>
-          <button className="cart-btn" onClick={() => setOpen(true)} aria-label="Carrito">
+          <button className="cart-btn" onClick={goCart} aria-label="Carrito">
             🛒<span>{count}</span><em>Carrito</em>
           </button>
         </div>
@@ -230,11 +228,15 @@ export default function App() {
         </nav>
       </header>
 
-      {route.page === 'legal' ? (
+      {route.page === 'cart' ? (
+        <main id="top">
+          <CartPage cart={cart} setQty={setQty} removeItem={removeItem} clearCart={clearCart} subtotal={subtotal} discount={discount} total={total} missing={missing} applied={applied} coupon={coupon} setCoupon={setCoupon} applyCoupon={applyCoupon} freeShipping={FREE_SHIPPING} whatsapp={WHATSAPP} onShop={() => filterTo('todos')} />
+        </main>
+      ) : route.page === 'legal' ? (
         <main id="top"><LegalPage kind={route.kind} onBack={() => go('top')} /></main>
       ) : route.page === 'prod' ? (
         <main id="top">
-          <ProductPage p={route.p} onAdd={(p, n) => { add(p, n); setOpen(true) }} onBack={() => go('top')} onOpen={setDetail} onCategory={filterTo} />
+          <ProductPage p={route.p} onAdd={(p, n) => { add(p, n); goCart() }} onBack={() => go('top')} onOpen={setDetail} onCategory={filterTo} />
         </main>
       ) : route.page === 'cat' ? (
         <main id="top" className="catpage">
@@ -269,7 +271,7 @@ export default function App() {
             <p>{settings.heroText}</p>
             <div className="hero-cta">
               <button className="btn-white" onClick={() => filterTo('todos')}>Comprar ahora →</button>
-              <button className="btn-line" onClick={() => filterTo('ofertas')}>Ver ofertas{maxOff ? ` -${maxOff}%` : ''}</button>
+              {maxOff > 0 && <button className="btn-line" onClick={() => filterTo('ofertas')}>Ver ofertas -{maxOff}%</button>}
             </div>
             <ul className="hero-stats">
               <li><b>Toda Colombia</b>envíos nacionales</li>
@@ -293,11 +295,20 @@ export default function App() {
         </section>
 
         <section className="trust">
-          {[['✔', 'Productos originales', 'Lote y registro verificable'], ['🚚', 'Envío gratis', `Desde ${money(FREE_SHIPPING)}`], ['💬', 'Asesoría por WhatsApp', 'Te guiamos según tu meta'], ['🔒', 'Compra segura', 'Pago confirmado contigo']].map(([i, t, d]) => (
+          {[['✔', 'Productos originales', 'Directo de proveedores'], ['🚚', 'Envíos a todo el país', FREE_SHIPPING ? `Gratis desde ${money(FREE_SHIPPING)}` : 'Por transportadora'], ['💬', 'Asesoría por WhatsApp', 'Te guiamos según tu meta'], ['🔒', 'Compra segura', 'Pago confirmado contigo']].map(([i, t, d]) => (
             <div key={t}><span>{i}</span><b>{t}</b><small>{d}</small></div>
           ))}
         </section>
 
+        {PRODUCTS.length === 0 && (
+        <section className="section" id="categorias">
+          <div className="head"><span className="eyebrow">Catálogo</span><h2>Estamos <em>preparando</em> la tienda</h2></div>
+          <p className="empty">Muy pronto verás aquí todos los productos. Mientras tanto, escríbenos por WhatsApp y te asesoramos.</p>
+          <a className="btn-white dark-btn" href={`https://wa.me/${WHATSAPP}`} target="_blank" rel="noreferrer">Escribir por WhatsApp</a>
+        </section>
+        )}
+
+        {PRODUCTS.length > 0 && (
         <section className="section" id="categorias">
           <div className="head row">
             <div><span className="eyebrow">Compra por categoría</span><h2>Compra por <em>categoría</em></h2></div>
@@ -325,6 +336,7 @@ export default function App() {
             <em>Ver ofertas →</em>
           </button>
         </section>
+        )}
 
         {shopCats.length > 0 && (
         <section className="section shop" id="tienda">
@@ -426,43 +438,6 @@ export default function App() {
       <Socials className="float" />
       {toast && <div className="toast">{toast}</div>}
 
-      <div className={open ? 'drawer-bg show' : 'drawer-bg'} onClick={() => setOpen(false)} />
-      <aside className={open ? 'drawer show' : 'drawer'} aria-hidden={!open}>
-        <div className="drawer-head"><h3>Tu carrito ({count})</h3><button onClick={() => setOpen(false)} aria-label="Cerrar">✕</button></div>
-        <div className="ship">
-          <p>{missing === 0 ? '🎉 ¡Tienes envío gratis!' : `Te faltan ${money(missing)} para envío gratis`}</p>
-          <div className="bar"><i style={{ width: Math.min(100, (total / FREE_SHIPPING) * 100) + '%' }} /></div>
-        </div>
-        <div className="lines">
-          {cart.length === 0 && <p className="empty">Tu carrito está vacío. ¡Agrega algo de fuerza!</p>}
-          {cart.map((x) => (
-            <div className="line" key={x.key}>
-              <div className="line-art"><ProductArt color={x.color} label={x.label} size={x.size} image={x.image} glow={false} /></div>
-              <div>
-                <b>{x.name}</b>
-                <small>{x.sub}</small>
-                <div className="qty">
-                  <button onClick={() => setQty(x.key, -1)}>−</button><span>{x.qty}</span><button onClick={() => setQty(x.key, 1)}>+</button>
-                </div>
-              </div>
-              <strong>{money(x.price * x.qty)}</strong>
-            </div>
-          ))}
-        </div>
-        {cart.length > 0 && (
-          <div className="drawer-foot">
-            <div className="coupon">
-              <input value={coupon} onChange={(e) => setCoupon(e.target.value)} placeholder="Cupón de descuento" />
-              <button onClick={applyCoupon}>Aplicar</button>
-            </div>
-            <div className="sum"><span>Subtotal</span><span>{money(subtotal)}</span></div>
-            {applied && <div className="sum green"><span>Cupón {applied}</span><span>-{money(discount)}</span></div>}
-            <div className="sum"><span>Envío</span><span>{missing === 0 ? 'Gratis' : 'Se calcula al confirmar'}</span></div>
-            <div className="sum big"><span>Total</span><span>{money(total)}</span></div>
-            <button className="btn-gold wide" onClick={checkout}>Pedir por WhatsApp</button>
-          </div>
-        )}
-      </aside>
     </>
   )
 }

@@ -60,7 +60,7 @@ export default function ProductPage({ p, onAdd, onBack, onOpen, onCategory }) {
           <button className="btn-line wide" onClick={buyNow}>Comprar por WhatsApp</button>
 
           <ul className="pp-perks">
-            <li>🚚 Envío gratis en compras desde {money(settings.freeShipping)}</li>
+            <li>🚚 {settings.freeShipping ? `Envío gratis en compras desde ${money(settings.freeShipping)}` : 'Envíos a toda Colombia'}</li>
             <li>✔ Producto 100% original</li>
             <li>💬 Asesoría gratis por WhatsApp</li>
           </ul>
