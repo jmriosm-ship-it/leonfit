@@ -38,11 +38,11 @@ export default function CouponsTab({ store, commit, notify }) {
 
   return (
     <>
-      <div className="ad-bar"><div><h2>Cupones de descuento <small>({list.length})</small></h2><p className="ad-sub">Tus clientes escriben el código en el carrito y el descuento se aplica solo. Aquí defines cuánto descuenta cada uno.</p></div></div>
+      <div className="lfa-bar"><div><h2>Cupones de descuento <small>({list.length})</small></h2><p className="lfa-sub">Tus clientes escriben el código en el carrito y el descuento se aplica solo. Aquí defines cuánto descuenta cada uno.</p></div></div>
 
-      <form className="ad-card ad-form" onSubmit={submit}>
+      <form className="lfa-card lfa-form" onSubmit={submit}>
         <h2>{editCode ? `Editar cupón ${editCode}` : 'Nuevo cupón'}</h2>
-        <div className="ad-row c3">
+        <div className="lfa-row c3">
           <label>Código *<input value={f.code} onChange={set('code')} placeholder="BIENVENIDO10" maxLength="20" /></label>
           <label>Tipo de descuento
             <select value={f.type} onChange={set('type')}>
@@ -52,20 +52,20 @@ export default function CouponsTab({ store, commit, notify }) {
           </label>
           <label>{f.type === 'pct' ? 'Cuánto descuenta (%) *' : 'Cuánto descuenta (COP) *'}<input type="number" min="1" value={f.value} onChange={set('value')} /></label>
         </div>
-        <div className="ad-row c3">
+        <div className="lfa-row c3">
           <label>Compra mínima (COP) <small>opcional</small><input type="number" min="0" value={f.min} onChange={set('min')} placeholder="Vacío = sin mínimo" /></label>
           <label>Válido hasta <small>opcional</small><input type="date" value={f.expires} onChange={set('expires')} /></label>
-          <div className="ad-checks"><label><input type="checkbox" checked={f.active} onChange={set('active')} /> Cupón activo</label></div>
+          <div className="lfa-checks"><label><input type="checkbox" checked={f.active} onChange={set('active')} /> Cupón activo</label></div>
         </div>
-        {err && <p className="ad-err">{err}</p>}
-        <div className="ad-actions">
-          {editCode && <button type="button" className="ad-btn" onClick={cancel}>Cancelar</button>}
-          <button className="ad-btn gold">{editCode ? 'Guardar cupón' : '+ Crear cupón'}</button>
+        {err && <p className="lfa-err">{err}</p>}
+        <div className="lfa-actions">
+          {editCode && <button type="button" className="lfa-btn" onClick={cancel}>Cancelar</button>}
+          <button className="lfa-btn gold">{editCode ? 'Guardar cupón' : '+ Crear cupón'}</button>
         </div>
       </form>
 
-      <div className="ad-card ad-tablewrap">
-        <table className="ad-table">
+      <div className="lfa-card lfa-tablewrap">
+        <table className="lfa-table">
           <thead><tr><th>Código</th><th>Descuento</th><th>Compra mínima</th><th>Vence</th><th>Estado</th><th></th></tr></thead>
           <tbody>
             {list.map((c) => {
@@ -78,9 +78,9 @@ export default function CouponsTab({ store, commit, notify }) {
                   <td>{c.expires || '—'}</td>
                   <td><span className={`pill ${tone}`}>{label}</span></td>
                   <td className="acts">
-                    <button className="ad-btn sm" onClick={() => edit(c)}>Editar</button>
-                    <button className="ad-btn sm" onClick={() => toggle(c)}>{c.active ? 'Desactivar' : 'Activar'}</button>
-                    <button className="ad-btn sm danger" onClick={() => remove(c)}>Eliminar</button>
+                    <button className="lfa-btn sm" onClick={() => edit(c)}>Editar</button>
+                    <button className="lfa-btn sm" onClick={() => toggle(c)}>{c.active ? 'Desactivar' : 'Activar'}</button>
+                    <button className="lfa-btn sm danger" onClick={() => remove(c)}>Eliminar</button>
                   </td>
                 </tr>
               )

@@ -36,12 +36,12 @@ function Form({ init, categories, onSave, onCancel, notify }) {
   const off = f.old && Number(f.old) > Number(f.price) ? Math.round((1 - f.price / f.old) * 100) : 0
 
   return (
-    <form className="ad-card ad-form" onSubmit={submit}>
+    <form className="lfa-card lfa-form" onSubmit={submit}>
       <h2>{init.id ? 'Editar producto' : 'Nuevo producto'}</h2>
-      <div className="ad-split">
-        <div className="ad-fields">
+      <div className="lfa-split">
+        <div className="lfa-fields">
           <label>Nombre *<input value={f.name} onChange={set('name')} placeholder="Whey Gold Standard" /></label>
-          <div className="ad-row">
+          <div className="lfa-row">
             <label>Marca<input value={f.brand} onChange={set('brand')} /></label>
             <label>Categoría *
               <select value={f.cat} onChange={set('cat')}>
@@ -50,40 +50,40 @@ function Form({ init, categories, onSave, onCancel, notify }) {
               </select>
             </label>
           </div>
-          <div className="ad-row">
+          <div className="lfa-row">
             <label>Precio (COP) *<input type="number" min="0" value={f.price} onChange={set('price')} placeholder="189000" /></label>
             <label>Precio anterior (tachado)<input type="number" min="0" value={f.old ?? ''} onChange={set('old')} placeholder="Vacío = sin oferta" /></label>
           </div>
-          {off > 0 && <p className="ad-hint ok">Se mostrará con <b>-{off}%</b> de descuento.</p>}
-          <div className="ad-row">
+          {off > 0 && <p className="lfa-hint ok">Se mostrará con <b>-{off}%</b> de descuento.</p>}
+          <div className="lfa-row">
             <label>Sabor / contenido<input value={f.flavor} onChange={set('flavor')} placeholder="Chocolate, 90 cápsulas…" /></label>
             <label>Presentación<input value={f.size} onChange={set('size')} placeholder="2 lb, 300 g…" /></label>
           </div>
-          <div className="ad-row">
+          <div className="lfa-row">
             <label>Servicios<input type="number" min="0" value={f.servings ?? ''} onChange={set('servings')} /></label>
             <label>Etiqueta (insignia)<input value={f.badge ?? ''} onChange={set('badge')} placeholder="Más vendido, Nuevo…" /></label>
           </div>
           <label>Descripción corta<textarea rows="3" value={f.desc} onChange={set('desc')} placeholder="Qué es y para qué sirve" /></label>
         </div>
 
-        <div className="ad-side">
+        <div className="lfa-side">
           <b>Foto del producto</b>
-          <div className="ad-pic">
+          <div className="lfa-pic">
             <ProductArt color={f.color} label={(f.label || f.name || 'LEON').slice(0, 8).toUpperCase()} size={f.size} name={f.name} image={f.image} />
           </div>
-          <label className="ad-btn file">
+          <label className="lfa-btn file">
             {up ? 'Subiendo…' : f.image ? 'Cambiar foto' : '📷 Subir foto'}
             <input type="file" accept="image/*" hidden onChange={pick} disabled={up} />
           </label>
-          <div className="ad-checks"><label><input type="checkbox" checked={cut} onChange={(e) => setCut(e.target.checked)} /> Quitar el fondo de la foto automáticamente</label></div>
-          {f.image && <button type="button" className="ad-link" onClick={() => setF({ ...f, image: '' })}>Quitar foto (usar dibujo)</button>}
+          <div className="lfa-checks"><label><input type="checkbox" checked={cut} onChange={(e) => setCut(e.target.checked)} /> Quitar el fondo de la foto automáticamente</label></div>
+          {f.image && <button type="button" className="lfa-link" onClick={() => setF({ ...f, image: '' })}>Quitar foto (usar dibujo)</button>}
           {!f.image && (
-            <div className="ad-row">
+            <div className="lfa-row">
               <label>Texto del pote<input value={f.label} onChange={set('label')} maxLength="8" placeholder="WHEY" /></label>
               <label>Color<input type="color" value={f.color} onChange={set('color')} /></label>
             </div>
           )}
-          <div className="ad-checks">
+          <div className="lfa-checks">
             <label><input type="checkbox" checked={!f.hidden} onChange={(e) => setF({ ...f, hidden: !e.target.checked })} /> Visible en la tienda</label>
             <label><input type="checkbox" checked={!!f.soldOut} onChange={set('soldOut')} /> Agotado</label>
             <label><input type="checkbox" checked={!!f.flash} onChange={set('flash')} /> ⚡ Mostrar en el inicio como oferta</label>
@@ -91,10 +91,10 @@ function Form({ init, categories, onSave, onCancel, notify }) {
           </div>
         </div>
       </div>
-      {err && <p className="ad-err">{err}</p>}
-      <div className="ad-actions">
-        <button type="button" className="ad-btn" onClick={onCancel}>Cancelar</button>
-        <button className="ad-btn gold" disabled={up}>Guardar producto</button>
+      {err && <p className="lfa-err">{err}</p>}
+      <div className="lfa-actions">
+        <button type="button" className="lfa-btn" onClick={onCancel}>Cancelar</button>
+        <button className="lfa-btn gold" disabled={up}>Guardar producto</button>
       </div>
     </form>
   )
@@ -131,14 +131,14 @@ export default function ProductsTab({ store, commit, notify }) {
 
   return (
     <>
-      <div className="ad-bar">
+      <div className="lfa-bar">
         <div><h2>Productos <small>({products.length})</small></h2></div>
-        <button className="ad-btn gold" onClick={() => setEdit({ ...EMPTY, cat: cat !== 'todas' ? cat : categories[0]?.id || '' })} disabled={!categories.length}>+ Nuevo producto</button>
+        <button className="lfa-btn gold" onClick={() => setEdit({ ...EMPTY, cat: cat !== 'todas' ? cat : categories[0]?.id || '' })} disabled={!categories.length}>+ Nuevo producto</button>
       </div>
-      {!categories.length && <p className="ad-hint">Primero crea una categoría en la pestaña <b>Categorías</b>.</p>}
-      <div className="ad-filters">
+      {!categories.length && <p className="lfa-hint">Primero crea una categoría en la pestaña <b>Categorías</b>.</p>}
+      <div className="lfa-filters">
         <input placeholder="Buscar producto…" value={q} onChange={(e) => setQ(e.target.value)} />
-        <div className="ad-chips">
+        <div className="lfa-chips">
           {[{ id: 'todas', name: 'Todas' }, ...categories].map((c) => (
             <button key={c.id} className={cat === c.id ? 'on' : ''} onClick={() => setCat(c.id)}>
               {c.name} <i>{c.id === 'todas' ? products.length : products.filter((p) => p.cat === c.id).length}</i>
@@ -147,8 +147,8 @@ export default function ProductsTab({ store, commit, notify }) {
         </div>
       </div>
 
-      <div className="ad-card ad-tablewrap">
-        <table className="ad-table">
+      <div className="lfa-card lfa-tablewrap">
+        <table className="lfa-table">
           <thead><tr><th></th><th>Producto</th><th>Categoría</th><th>Precio</th><th>Estado</th><th></th></tr></thead>
           <tbody>
             {list.map((p) => (
@@ -165,10 +165,10 @@ export default function ProductsTab({ store, commit, notify }) {
                   {p.badge && <span className="pill">{p.badge}</span>}
                 </td>
                 <td className="acts">
-                  <button className="ad-btn sm" onClick={() => setEdit(p)}>Editar</button>
-                  <button className="ad-btn sm" onClick={() => patch(p.id, { hidden: !p.hidden }, p.hidden ? 'Ahora es visible' : 'Producto oculto')}>{p.hidden ? 'Mostrar' : 'Ocultar'}</button>
-                  <button className="ad-btn sm" onClick={() => patch(p.id, { soldOut: !p.soldOut }, p.soldOut ? 'Disponible de nuevo' : 'Marcado agotado')}>{p.soldOut ? 'Hay stock' : 'Agotar'}</button>
-                  <button className="ad-btn sm danger" onClick={() => remove(p)}>Eliminar</button>
+                  <button className="lfa-btn sm" onClick={() => setEdit(p)}>Editar</button>
+                  <button className="lfa-btn sm" onClick={() => patch(p.id, { hidden: !p.hidden }, p.hidden ? 'Ahora es visible' : 'Producto oculto')}>{p.hidden ? 'Mostrar' : 'Ocultar'}</button>
+                  <button className="lfa-btn sm" onClick={() => patch(p.id, { soldOut: !p.soldOut }, p.soldOut ? 'Disponible de nuevo' : 'Marcado agotado')}>{p.soldOut ? 'Hay stock' : 'Agotar'}</button>
+                  <button className="lfa-btn sm danger" onClick={() => remove(p)}>Eliminar</button>
                 </td>
               </tr>
             ))}

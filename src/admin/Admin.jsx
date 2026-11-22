@@ -30,16 +30,16 @@ function Login({ onIn }) {
     setBusy(false)
   }
   return (
-    <div className="ad-login">
+    <div className="lfa-login">
       <form onSubmit={submit}>
         <img src={`${import.meta.env.BASE_URL}logo.jpg`} alt="LeonFit" />
         <h1>Panel de administración</h1>
         <p>Entra con tu correo y contraseña de administrador.</p>
         <input type={CLOUD ? 'email' : 'text'} placeholder={CLOUD ? 'Correo' : 'Correo o usuario (cualquiera)'} autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} required={CLOUD} />
         <input type="password" placeholder="Contraseña" autoComplete="current-password" value={pass} onChange={(e) => setPass(e.target.value)} required />
-        {err && <p className="ad-err">{err}</p>}
-        <button className="ad-btn gold" disabled={busy}>{busy ? 'Entrando…' : 'Entrar'}</button>
-        {!CLOUD && <small className="ad-demo">Modo demo: contraseña <b>{DEMO_PASSWORD}</b>. Los cambios se guardan solo en este navegador hasta que conectes Supabase.</small>}
+        {err && <p className="lfa-err">{err}</p>}
+        <button className="lfa-btn gold" disabled={busy}>{busy ? 'Entrando…' : 'Entrar'}</button>
+        {!CLOUD && <small className="lfa-demo">Modo demo: contraseña <b>{DEMO_PASSWORD}</b>. Los cambios se guardan solo en este navegador hasta que conectes Supabase.</small>}
         <a href="#/">← Volver a la tienda</a>
       </form>
     </div>
@@ -66,24 +66,24 @@ export default function Admin() {
 
   const props = { store, commit, notify }
   return (
-    <div className="ad">
-      <header className="ad-top">
-        <div className="ad-brand">
+    <div className="lfa">
+      <header className="lfa-top">
+        <div className="lfa-brand">
           <img src={`${import.meta.env.BASE_URL}logo.jpg`} alt="" />
           <b>LEON<span>FIT</span></b><em>Admin</em>
         </div>
-        <span className={CLOUD ? 'ad-mode on' : 'ad-mode'}>{CLOUD ? '● Conectado a la nube' : '● Modo demo (solo este navegador)'}</span>
-        <div className="ad-top-r">
-          <a className="ad-btn" href="#/" target="_blank" rel="noreferrer">Ver tienda ↗</a>
-          <button className="ad-btn" onClick={() => { signOut(); setSession(null) }}>Cerrar sesión</button>
+        <span className={CLOUD ? 'lfa-mode on' : 'lfa-mode'}>{CLOUD ? '● Conectado a la nube' : '● Modo demo (solo este navegador)'}</span>
+        <div className="lfa-top-r">
+          <a className="lfa-btn" href="#/" target="_blank" rel="noreferrer">Ver tienda ↗</a>
+          <button className="lfa-btn" onClick={() => { signOut(); setSession(null) }}>Cerrar sesión</button>
         </div>
       </header>
 
-      <nav className="ad-tabs">
+      <nav className="lfa-tabs">
         {TABS.map(([id, name]) => <button key={id} className={tab === id ? 'on' : ''} onClick={() => setTab(id)}>{name}</button>)}
       </nav>
 
-      <main className="ad-main">
+      <main className="lfa-main">
         {tab === 'productos' && <ProductsTab {...props} />}
         {tab === 'categorias' && <CategoriesTab {...props} />}
         {tab === 'combos' && <CombosTab {...props} />}
@@ -92,7 +92,7 @@ export default function Admin() {
         {tab === 'copia' && <BackupTab {...props} />}
       </main>
 
-      {note && <div className={note.bad ? 'ad-toast bad' : 'ad-toast'}>{note.text}</div>}
+      {note && <div className={note.bad ? 'lfa-toast bad' : 'lfa-toast'}>{note.text}</div>}
     </div>
   )
 }

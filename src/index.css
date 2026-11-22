@@ -457,11 +457,11 @@ details p{color:var(--mut);margin-top:12px}
 .hero-logo{width:58%;left:21%;top:10%;border-radius:50%;pointer-events:none;box-shadow:0 0 90px -20px rgba(201,161,90,.5)}
 
 /* ---- Admin: filas nuevas ---- */
-.ad-row.c3{grid-template-columns:1fr 1fr 1fr}
-.ad-row.pair{grid-template-columns:1fr 1fr auto;align-items:center}
-.ad-row.trust{grid-template-columns:70px 1fr 1fr auto;align-items:center}
-.ad-row.pair:has(> input:only-of-type){grid-template-columns:1fr auto}
-.ad label small{text-transform:none;letter-spacing:0;font-weight:500;opacity:.7}
+.lfa-row.c3{grid-template-columns:1fr 1fr 1fr}
+.lfa-row.pair{grid-template-columns:1fr 1fr auto;align-items:center}
+.lfa-row.trust{grid-template-columns:70px 1fr 1fr auto;align-items:center}
+.lfa-row.pair:has(> input:only-of-type){grid-template-columns:1fr auto}
+.lfa label small{text-transform:none;letter-spacing:0;font-weight:500;opacity:.7}
 @media(max-width:700px){
-  .ad-row.c3,.ad-row.pair,.ad-row.trust{grid-template-columns:1fr}
+  .lfa-row.c3,.lfa-row.pair,.lfa-row.trust{grid-template-columns:1fr}
 }

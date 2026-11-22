@@ -44,8 +44,8 @@ export default function Diag() {
     const t = setTimeout(() => {
       const el = box.current
       if (!el) return
-      const top = el.querySelector('.ad-top')
-      const main = el.querySelector('.ad-main')
+      const top = el.querySelector('.lfa-top')
+      const main = el.querySelector('.lfa-main')
       add('Panel dibujado: texto', `${el.innerText.length} caracteres`)
       add('Panel dibujado: elementos', el.querySelectorAll('*').length)
       if (top) {

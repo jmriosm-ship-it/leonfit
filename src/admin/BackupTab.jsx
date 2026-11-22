@@ -31,11 +31,11 @@ export default function BackupTab({ store, commit, notify }) {
 
   return (
     <>
-      <div className="ad-bar"><div><h2>Copia de seguridad</h2><p className="ad-sub">Descarga una copia antes de hacer cambios grandes. Guarda todo: productos, categorías, combos y ajustes.</p></div></div>
-      <div className="ad-cards">
-        <section className="ad-card ad-sec"><h3>Descargar copia</h3><p className="ad-sub">Un archivo .json con toda la tienda.</p><button className="ad-btn gold" onClick={download}>⬇ Descargar copia</button></section>
-        <section className="ad-card ad-sec"><h3>Restaurar copia</h3><p className="ad-sub">Sube un archivo descargado antes. Reemplaza todo lo actual.</p><button className="ad-btn" onClick={() => file.current.click()}>⬆ Restaurar copia</button><input ref={file} type="file" accept="application/json,.json" hidden onChange={restore} /></section>
-        <section className="ad-card ad-sec"><h3>Volver a los ejemplos</h3><p className="ad-sub">Deja la tienda con los productos de ejemplo iniciales.</p><button className="ad-btn danger" onClick={reset}>Restablecer ejemplos</button></section>
+      <div className="lfa-bar"><div><h2>Copia de seguridad</h2><p className="lfa-sub">Descarga una copia antes de hacer cambios grandes. Guarda todo: productos, categorías, combos y ajustes.</p></div></div>
+      <div className="lfa-cards">
+        <section className="lfa-card lfa-sec"><h3>Descargar copia</h3><p className="lfa-sub">Un archivo .json con toda la tienda.</p><button className="lfa-btn gold" onClick={download}>⬇ Descargar copia</button></section>
+        <section className="lfa-card lfa-sec"><h3>Restaurar copia</h3><p className="lfa-sub">Sube un archivo descargado antes. Reemplaza todo lo actual.</p><button className="lfa-btn" onClick={() => file.current.click()}>⬆ Restaurar copia</button><input ref={file} type="file" accept="application/json,.json" hidden onChange={restore} /></section>
+        <section className="lfa-card lfa-sec"><h3>Volver a los ejemplos</h3><p className="lfa-sub">Deja la tienda con los productos de ejemplo iniciales.</p><button className="lfa-btn danger" onClick={reset}>Restablecer ejemplos</button></section>
       </div>
     </>
   )

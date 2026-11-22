@@ -38,16 +38,16 @@ export default function CategoriesTab({ store, commit, notify }) {
 
   return (
     <>
-      <div className="ad-bar"><div><h2>Categorías <small>({categories.length})</small></h2><p className="ad-sub">Aparecen en el menú y en “Elige tu categoría”. El orden de aquí es el de la tienda.</p></div></div>
+      <div className="lfa-bar"><div><h2>Categorías <small>({categories.length})</small></h2><p className="lfa-sub">Aparecen en el menú y en “Elige tu categoría”. El orden de aquí es el de la tienda.</p></div></div>
 
-      <form className="ad-card ad-inline" onSubmit={add}>
+      <form className="lfa-card lfa-inline" onSubmit={add}>
         <label>Nueva categoría<input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Ej. Ropa deportiva" /></label>
         <label>Etiqueta corta<input value={form.tag} onChange={(e) => setForm({ ...form, tag: e.target.value })} placeholder="Ej. Estilo" /></label>
-        <button className="ad-btn gold">+ Crear categoría</button>
+        <button className="lfa-btn gold">+ Crear categoría</button>
       </form>
 
-      <div className="ad-card ad-tablewrap">
-        <table className="ad-table">
+      <div className="lfa-card lfa-tablewrap">
+        <table className="lfa-table">
           <thead><tr><th>#</th><th>Nombre</th><th>Etiqueta</th><th>Productos</th><th></th></tr></thead>
           <tbody>
             {categories.map((c, i) => (
@@ -59,19 +59,19 @@ export default function CategoriesTab({ store, commit, notify }) {
                 <td className="acts">
                   {editId === c.id ? (
                     <>
-                      <button className="ad-btn sm gold" onClick={async () => {
+                      <button className="lfa-btn sm gold" onClick={async () => {
                         const name = document.getElementById(`n-${c.id}`).value.trim()
                         if (!name) return
                         if (await update(c.id, { name, tag: document.getElementById(`t-${c.id}`).value.trim() })) setEditId(null)
                       }}>Guardar</button>
-                      <button className="ad-btn sm" onClick={() => setEditId(null)}>Cancelar</button>
+                      <button className="lfa-btn sm" onClick={() => setEditId(null)}>Cancelar</button>
                     </>
                   ) : (
                     <>
-                      <button className="ad-btn sm" onClick={() => move(i, -1)} disabled={i === 0} aria-label="Subir">↑</button>
-                      <button className="ad-btn sm" onClick={() => move(i, 1)} disabled={i === categories.length - 1} aria-label="Bajar">↓</button>
-                      <button className="ad-btn sm" onClick={() => setEditId(c.id)}>Editar</button>
-                      <button className="ad-btn sm danger" onClick={() => remove(c)}>Eliminar</button>
+                      <button className="lfa-btn sm" onClick={() => move(i, -1)} disabled={i === 0} aria-label="Subir">↑</button>
+                      <button className="lfa-btn sm" onClick={() => move(i, 1)} disabled={i === categories.length - 1} aria-label="Bajar">↓</button>
+                      <button className="lfa-btn sm" onClick={() => setEditId(c.id)}>Editar</button>
+                      <button className="lfa-btn sm danger" onClick={() => remove(c)}>Eliminar</button>
                     </>
                   )}
                 </td>
