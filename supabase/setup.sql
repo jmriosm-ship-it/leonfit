@@ -34,3 +34,8 @@ create policy "admin borra fotos" on storage.objects for delete to authenticated
 -- 3) El administrador se crea en Supabase > Authentication > Users > Add user
 --    (correo + contraseña, marca "Auto Confirm User"). Desactiva los registros públicos en
 --    Authentication > Providers > Email > "Allow new users to sign up" para que nadie más pueda crear cuentas.
+
+-- 4) Permisos de las tablas (los proyectos nuevos de Supabase ya no los dan solos).
+grant usage on schema public to anon, authenticated;
+grant select on public.site_data to anon, authenticated;
+grant insert, update on public.site_data to authenticated;
