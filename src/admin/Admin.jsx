@@ -5,6 +5,7 @@ import { CLOUD, DEMO_PASSWORD, getSession, signIn, signOut } from '../store.js'
 import ProductsTab from './ProductsTab.jsx'
 import CategoriesTab from './CategoriesTab.jsx'
 import CombosTab from './CombosTab.jsx'
+import CouponsTab from './CouponsTab.jsx'
 import SettingsTab from './SettingsTab.jsx'
 import BackupTab from './BackupTab.jsx'
 
@@ -12,6 +13,7 @@ const TABS = [
   ['productos', '📦 Productos'],
   ['categorias', '🗂 Categorías'],
   ['combos', '🎁 Combos de oferta'],
+  ['cupones', '🏷 Cupones'],
   ['pagina', '🛠 Control de la página'],
   ['copia', '💾 Copia de seguridad'],
 ]
@@ -85,6 +87,7 @@ export default function Admin() {
         {tab === 'productos' && <ProductsTab {...props} />}
         {tab === 'categorias' && <CategoriesTab {...props} />}
         {tab === 'combos' && <CombosTab {...props} />}
+        {tab === 'cupones' && <CouponsTab {...props} />}
         {tab === 'pagina' && <SettingsTab {...props} />}
         {tab === 'copia' && <BackupTab {...props} />}
       </main>

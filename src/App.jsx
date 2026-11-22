@@ -65,7 +65,12 @@ export default function App() {
   const { categories: CATEGORIES, settings } = store
   const PRODUCTS = useMemo(() => store.products.filter((p) => !p.hidden), [store.products])
   const COMBOS = useMemo(() => store.combos.filter((c) => c.active !== false), [store.combos])
-  const COUPONS = useMemo(() => Object.fromEntries(settings.coupons.map((c) => [String(c.code).toUpperCase(), c.pct / 100])), [settings.coupons])
+  const COUPONS = useMemo(() => {
+    const today = new Date().toISOString().slice(0, 10)
+    return Object.fromEntries((settings.coupons || [])
+      .filter((c) => c.active !== false && !(c.expires && c.expires < today))
+      .map((c) => [String(c.code).toUpperCase(), { type: c.type === 'cop' ? 'cop' : 'pct', value: Number(c.value ?? c.pct) || 0, min: Number(c.min) || 0 }]))
+  }, [settings.coupons])
   const FREE_SHIPPING = settings.freeShipping
   const WHATSAPP = settings.whatsapp
   const byId = (id) => PRODUCTS.find((p) => p.id === id)
@@ -146,14 +151,18 @@ export default function App() {
 
   const count = cart.reduce((a, x) => a + x.qty, 0)
   const subtotal = cart.reduce((a, x) => a + x.price * x.qty, 0)
-  const discount = applied ? subtotal * COUPONS[applied] : 0
+  const cp = applied ? COUPONS[applied] : null
+  const couponOk = Boolean(cp) && subtotal >= cp.min
+  const discount = couponOk ? (cp.type === 'cop' ? Math.min(cp.value, subtotal) : Math.round((subtotal * cp.value) / 100)) : 0
   const total = subtotal - discount
   const missing = Math.max(0, FREE_SHIPPING - total)
 
   const applyCoupon = () => {
     const code = coupon.trim().toUpperCase()
-    if (COUPONS[code]) { setApplied(code); flash(`Cupón ${code} aplicado`) }
-    else { setApplied(null); flash('Cupón no válido') }
+    const c = COUPONS[code]
+    if (!c) { setApplied(null); flash('Cupón no válido o vencido') }
+    else if (subtotal < c.min) { setApplied(null); flash(`Este cupón aplica en compras desde ${money(c.min)}`) }
+    else { setApplied(code); flash(`Cupón ${code} aplicado`) }
   }
 
   const catId = route.page === 'cat' ? route.id : null
@@ -170,6 +179,8 @@ export default function App() {
 
   const flagged = PRODUCTS.filter((p) => p.flash)
   const flashDeals = flagged.length ? flagged : [...PRODUCTS].filter((p) => p.old).sort((a, b) => pct(b) - pct(a)).slice(0, settings.flashCount || 4)
+  const heroPicks = PRODUCTS.filter((p) => p.hero)
+  const heroItems = (heroPicks.length ? heroPicks : PRODUCTS.filter((p) => p.image)).slice(0, 3)
   const go = (id) => {
     setMenu(false)
     if (window.location.hash) {
@@ -230,7 +241,7 @@ export default function App() {
 
       {route.page === 'cart' ? (
         <main id="top">
-          <CartPage cart={cart} setQty={setQty} removeItem={removeItem} clearCart={clearCart} subtotal={subtotal} discount={discount} total={total} missing={missing} applied={applied} coupon={coupon} setCoupon={setCoupon} applyCoupon={applyCoupon} freeShipping={FREE_SHIPPING} whatsapp={WHATSAPP} onShop={() => filterTo('todos')} />
+          <CartPage cart={cart} setQty={setQty} removeItem={removeItem} clearCart={clearCart} subtotal={subtotal} discount={discount} total={total} missing={missing} applied={couponOk ? applied : null} coupon={coupon} setCoupon={setCoupon} applyCoupon={applyCoupon} freeShipping={FREE_SHIPPING} whatsapp={WHATSAPP} onShop={() => filterTo('todos')} />
         </main>
       ) : route.page === 'legal' ? (
         <main id="top"><LegalPage kind={route.kind} onBack={() => go('top')} /></main>
@@ -274,20 +285,27 @@ export default function App() {
               {maxOff > 0 && <button className="btn-line" onClick={() => filterTo('ofertas')}>Ver ofertas -{maxOff}%</button>}
             </div>
             <ul className="hero-stats">
-              <li><b>Toda Colombia</b>envíos nacionales</li>
-              <li><b>100%</b>originales</li>
-              <li><b>L–S</b>9am a 5pm</li>
+              {(settings.heroStats || []).map(([b, t], i) => <li key={i}><b>{b}</b>{t}</li>)}
             </ul>
           </div>
           <div className="hero-art">
             {settings.heroImage ? (
               <img className="hero-img" src={settings.heroImage} alt="LeonFit" />
+            ) : heroItems.length ? (
+              <>
+                <div className="hero-ring" />
+                <div className={`hero-stack n${heroItems.length}`}>
+                  {heroItems.map((p, i) => (
+                    <button key={p.id} className={`stack s${i + 1}`} onClick={() => setDetail(p)} aria-label={p.name}>
+                      <ProductArt color={p.color} label={p.label} size={p.size} name={p.name} image={p.image} />
+                    </button>
+                  ))}
+                </div>
+              </>
             ) : (
               <>
                 <div className="hero-ring" />
-                <div className="stack s1"><ProductArt color="#6b3a1e" label="WHEY" size="2 lb" name="Whey" /></div>
-                <div className="stack s2"><ProductArt color="#e5322b" label="PRE" size="300 g" name="Pre" /></div>
-                <div className="stack s3"><ProductArt color="#e8e8e8" label="CREA" size="300 g" name="Creatina" /></div>
+                <img className="hero-logo stack" src={`${BASE}logo.jpg`} alt="LeonFit" />
               </>
             )}
             <div className="hero-tag">{settings.heroTag || (maxOff ? `-${maxOff}%` : "🦁")}<small>{settings.heroTagSmall}</small></div>
@@ -295,7 +313,7 @@ export default function App() {
         </section>
 
         <section className="trust">
-          {[['✔', 'Productos originales', 'Directo de proveedores'], ['🚚', 'Envíos a todo el país', FREE_SHIPPING ? `Gratis desde ${money(FREE_SHIPPING)}` : 'Por transportadora'], ['💬', 'Asesoría por WhatsApp', 'Te guiamos según tu meta'], ['🔒', 'Compra segura', 'Pago confirmado contigo']].map(([i, t, d]) => (
+          {(settings.trust || []).map(([i, t, d]) => (
             <div key={t}><span>{i}</span><b>{t}</b><small>{d}</small></div>
           ))}
         </section>
@@ -392,18 +410,15 @@ export default function App() {
         )}
 
         <section className="section about" id="nosotros">
-          <div className="about-logo"><img src={`${import.meta.env.BASE_URL}logo.jpg`} alt="Logo LeonFit" /></div>
+          <div className="about-logo"><img src={`${BASE}logo.jpg`} alt="Logo LeonFit" /></div>
           <div>
-            <span className="eyebrow">Por qué LeonFit</span>
-            <h2>Rendimiento real,<br />precio de manada.</h2>
-            <p>Somos una tienda especializada en nutrición deportiva. Seleccionamos cada producto, verificamos su origen y te asesoramos para que compres lo que realmente necesitas, sin pagar de más.</p>
+            <span className="eyebrow">{settings.aboutEyebrow}</span>
+            <h2>{fancy(settings.aboutTitle)}</h2>
+            <p>{settings.aboutText}</p>
             <ul className="checks">
-              <li>Solo marcas y proveedores autorizados</li>
-              <li>Asesoría personalizada sin costo</li>
-              <li>Descuentos por volumen, cupones y combos</li>
-              <li>Entrega rápida en tu ciudad y envíos nacionales</li>
+              {(settings.aboutChecks || []).map((c, i) => <li key={i}>{c}</li>)}
             </ul>
-            <button className="btn-gold" onClick={() => window.open(`https://wa.me/${WHATSAPP}`, '_blank')}>Hablar con un asesor</button>
+            {settings.aboutButton && <button className="btn-gold" onClick={() => window.open(`https://wa.me/${WHATSAPP}`, '_blank')}>{settings.aboutButton}</button>}
           </div>
         </section>
 
@@ -417,9 +432,9 @@ export default function App() {
         </section>
 
         <section className="cta">
-          <h2>¿Listo para tu próximo nivel?</h2>
-          {settings.coupons[0] && <p>Usa el cupón <b>{settings.coupons[0].code}</b> en tu primera compra.</p>}
-          <button className="btn-gold" onClick={() => filterTo('todos')}>Ir a la tienda</button>
+          <h2>{settings.ctaTitle}</h2>
+          {Object.keys(COUPONS)[0] && <p>Usa el cupón <b>{Object.keys(COUPONS)[0]}</b> en tu compra.</p>}
+          <button className="btn-gold" onClick={() => filterTo('todos')}>{settings.ctaButton}</button>
         </section>
       </main>
       )}
@@ -427,7 +442,7 @@ export default function App() {
       <footer className="footer">
         <div>
           <img src={`${import.meta.env.BASE_URL}logo.jpg`} alt="" />
-          <p>LeonFit — Sports Supplement Store.<br />Suplementación y moda deportiva.</p>
+          <p>{fancy(settings.footerText)}</p>
         </div>
         <div><b>Tienda</b>{CATEGORIES.slice(0, 4).map((c) => <a key={c.id} onClick={() => filterTo(c.id)}>{c.name}</a>)}</div>
         <div><b>Ayuda</b><a onClick={() => go('faq')}>Preguntas</a><a onClick={() => go('combos')}>Combos</a><a onClick={() => go('nosotros')}>Nosotros</a><a href="#/terminos">Términos y condiciones</a><a href="#/privacidad">Política de privacidad</a></div>

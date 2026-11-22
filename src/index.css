@@ -445,3 +445,23 @@ details p{color:var(--mut);margin-top:12px}
   .f-grid{grid-template-columns:1fr}
   .checkout{padding:18px}
 }
+
+/* ---- Portada con los productos del admin (se mueven) ---- */
+.hero-stack{position:absolute;inset:0}
+.stack{display:block;background:none;border:0;padding:0;cursor:pointer}
+.stack .art{width:100%;height:auto}
+.stack .art-img{object-fit:contain}
+.hero-art .n1 .s1{width:56%;left:22%;top:6%}
+.hero-art .n2 .s1{width:44%;left:6%;top:12%}
+.hero-art .n2 .s2{width:44%;left:50%;right:auto;top:24%}
+.hero-logo{width:58%;left:21%;top:10%;border-radius:50%;pointer-events:none;box-shadow:0 0 90px -20px rgba(201,161,90,.5)}
+
+/* ---- Admin: filas nuevas ---- */
+.ad-row.c3{grid-template-columns:1fr 1fr 1fr}
+.ad-row.pair{grid-template-columns:1fr 1fr auto;align-items:center}
+.ad-row.trust{grid-template-columns:70px 1fr 1fr auto;align-items:center}
+.ad-row.pair:has(> input:only-of-type){grid-template-columns:1fr auto}
+.ad label small{text-transform:none;letter-spacing:0;font-weight:500;opacity:.7}
+@media(max-width:700px){
+  .ad-row.c3,.ad-row.pair,.ad-row.trust{grid-template-columns:1fr}
+}

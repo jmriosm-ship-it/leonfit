@@ -3,11 +3,12 @@ import ProductArt from '../components/ProductArt.jsx'
 import { money, pct } from '../data.js'
 import { uploadImage } from '../store.js'
 
-const EMPTY = { name: '', brand: 'LeonFit Lab', cat: '', price: '', old: '', flavor: '', size: '', servings: '', color: '#c9a15a', label: '', badge: '', desc: '', image: '', hidden: false, soldOut: false, flash: false, rating: 5, reviews: 0 }
+const EMPTY = { name: '', brand: 'LeonFit Lab', cat: '', price: '', old: '', flavor: '', size: '', servings: '', color: '#c9a15a', label: '', badge: '', desc: '', image: '', hidden: false, soldOut: false, flash: false, hero: false, rating: 5, reviews: 0 }
 
 function Form({ init, categories, onSave, onCancel, notify }) {
   const [f, setF] = useState(init)
   const [up, setUp] = useState(false)
+  const [cut, setCut] = useState(true)
   const [err, setErr] = useState('')
   const set = (k) => (e) => setF({ ...f, [k]: e.target.type === 'checkbox' ? e.target.checked : e.target.value })
 
@@ -15,7 +16,7 @@ function Form({ init, categories, onSave, onCancel, notify }) {
     const file = e.target.files?.[0]
     if (!file) return
     setUp(true)
-    try { const url = await uploadImage(file); setF((x) => ({ ...x, image: url })) } catch (x) { notify(x.message, true) }
+    try { const url = await uploadImage(file, { cutout: cut }); setF((x) => ({ ...x, image: url })) } catch (x) { notify(x.message, true) }
     setUp(false)
     e.target.value = ''
   }
@@ -74,6 +75,7 @@ function Form({ init, categories, onSave, onCancel, notify }) {
             {up ? 'Subiendo…' : f.image ? 'Cambiar foto' : '📷 Subir foto'}
             <input type="file" accept="image/*" hidden onChange={pick} disabled={up} />
           </label>
+          <div className="ad-checks"><label><input type="checkbox" checked={cut} onChange={(e) => setCut(e.target.checked)} /> Quitar el fondo de la foto automáticamente</label></div>
           {f.image && <button type="button" className="ad-link" onClick={() => setF({ ...f, image: '' })}>Quitar foto (usar dibujo)</button>}
           {!f.image && (
             <div className="ad-row">
@@ -84,7 +86,8 @@ function Form({ init, categories, onSave, onCancel, notify }) {
           <div className="ad-checks">
             <label><input type="checkbox" checked={!f.hidden} onChange={(e) => setF({ ...f, hidden: !e.target.checked })} /> Visible en la tienda</label>
             <label><input type="checkbox" checked={!!f.soldOut} onChange={set('soldOut')} /> Agotado</label>
-            <label><input type="checkbox" checked={!!f.flash} onChange={set('flash')} /> En oferta relámpago</label>
+            <label><input type="checkbox" checked={!!f.flash} onChange={set('flash')} /> ⚡ Mostrar en el inicio como oferta</label>
+            <label><input type="checkbox" checked={!!f.hero} onChange={set('hero')} /> 🦁 Mostrar en la portada (se mueve)</label>
           </div>
         </div>
       </div>
@@ -157,7 +160,8 @@ export default function ProductsTab({ store, commit, notify }) {
                 <td>
                   {p.hidden && <span className="pill gray">Oculto</span>}
                   {p.soldOut && <span className="pill red">Agotado</span>}
-                  {p.flash && <span className="pill gold">Relámpago</span>}
+                  {p.flash && <span className="pill gold">Oferta inicio</span>}
+                  {p.hero && <span className="pill gold">Portada</span>}
                   {p.badge && <span className="pill">{p.badge}</span>}
                 </td>
                 <td className="acts">

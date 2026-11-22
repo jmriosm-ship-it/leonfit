@@ -17,7 +17,8 @@ export default function SettingsTab({ store, commit, notify }) {
   const set = (k) => (e) => setS({ ...s, [k]: e.target.type === 'checkbox' ? e.target.checked : e.target.value })
   const num = (k) => (e) => setS({ ...s, [k]: Number(e.target.value) || 0 })
 
-  const setCoupon = (i, ch) => setS({ ...s, coupons: s.coupons.map((c, j) => (j === i ? { ...c, ...ch } : c)) })
+  const setRow = (key, k, idx, v) => setS({ ...s, [key]: s[key].map((r, j) => (j === k ? r.map((x, m) => (m === idx ? v : x)) : r)) })
+  const setCheck = (k, v) => setS({ ...s, aboutChecks: s.aboutChecks.map((x, j) => (j === k ? v : x)) })
   const setFaq = (i, k, v) => setS({ ...s, faq: s.faq.map((f, j) => (j === i ? (k === 0 ? [v, f[1]] : [f[0], v]) : f)) })
 
   const pickHero = async (e) => {
@@ -29,14 +30,17 @@ export default function SettingsTab({ store, commit, notify }) {
 
   const save = async () => {
     setBusy(true)
+    const { coupons: _cupones, ...rest } = s // los cupones se manejan en su propia pestaña
     const clean = {
-      ...s,
+      ...rest,
       whatsapp: String(s.whatsapp).replace(/\D/g, ''),
-      coupons: s.coupons.filter((c) => c.code.trim()).map((c) => ({ code: c.code.trim().toUpperCase(), pct: Math.min(90, Math.max(1, Number(c.pct) || 0)) })),
+      trust: (s.trust || []).filter(([, t]) => t.trim()),
+      heroStats: (s.heroStats || []).filter(([b]) => b.trim()),
+      aboutChecks: (s.aboutChecks || []).filter((x) => x.trim()),
       faq: s.faq.filter(([a, b]) => a.trim() && b.trim()),
       flashCount: Math.min(8, Math.max(2, Number(s.flashCount) || 4)),
     }
-    if (await commit((d) => ({ ...d, settings: clean }), 'Página actualizada ✔')) setS(clean)
+    if (await commit((d) => ({ ...d, settings: { ...d.settings, ...clean } }), 'Página actualizada ✔')) setS(clean)
     setBusy(false)
   }
 
@@ -54,9 +58,9 @@ export default function SettingsTab({ store, commit, notify }) {
       <Section title="Portada" hint="En el título, una palabra entre *asteriscos* sale en dorado. Cada línea nueva es un salto de línea.">
         <div className="ad-checks">
           <b>Imagen de la portada</b>
-          <p className="ad-hint">Ahora se muestra una imagen de ejemplo (botes dibujados). Sube tu foto para reemplazarla.</p>
+          <p className="ad-hint">Opcional. Si no subes una foto, la portada muestra (flotando) los productos que marques con “Mostrar en la portada”.</p>
           <label className="ad-btn file" style={{ maxWidth: 220 }}>📷 {s.heroImage ? 'Cambiar foto' : 'Subir foto'}<input type="file" accept="image/*" hidden onChange={pickHero} /></label>
-          {s.heroImage && <button type="button" className="ad-link" onClick={() => setS({ ...s, heroImage: '' })}>Quitar y volver al ejemplo</button>}
+          {s.heroImage && <button type="button" className="ad-link" onClick={() => setS({ ...s, heroImage: '' })}>Quitar foto</button>}
         </div>
         <label>Texto pequeño superior<input value={s.heroEyebrow} onChange={set('heroEyebrow')} /></label>
         <label>Título<textarea rows="3" value={s.heroTitle} onChange={set('heroTitle')} /></label>
@@ -76,18 +80,54 @@ export default function SettingsTab({ store, commit, notify }) {
         <label>Título de la sección de combos<input value={s.combosTitle} onChange={set('combosTitle')} /></label>
       </Section>
 
-      <Section title="Envío y cupones">
-        <label>Envío gratis desde (COP)<input type="number" min="0" value={s.freeShipping} onChange={num('freeShipping')} /></label>
-        <b>Cupones de descuento</b>
-        {s.coupons.map((c, i) => (
-          <div className="ad-row coupon" key={i}>
-            <input value={c.code} onChange={(e) => setCoupon(i, { code: e.target.value })} placeholder="CÓDIGO" />
-            <input type="number" min="1" max="90" value={c.pct} onChange={(e) => setCoupon(i, { pct: e.target.value })} />
-            <span>% de descuento</span>
-            <button className="ad-btn sm danger" onClick={() => setS({ ...s, coupons: s.coupons.filter((_, j) => j !== i) })}>Quitar</button>
+      <Section title="Envío" hint="Los cupones de descuento se crean en la pestaña Cupones.">
+        <label>Envío gratis desde (COP) — deja 0 si no ofrecen envío gratis<input type="number" min="0" value={s.freeShipping} onChange={num('freeShipping')} /></label>
+      </Section>
+
+      <Section title="Cifras de la portada" hint="Los tres datos pequeños debajo de los botones de la portada.">
+        {(s.heroStats || []).map(([b, t], i) => (
+          <div className="ad-row pair" key={i}>
+            <input value={b} onChange={(e) => setRow('heroStats', i, 0, e.target.value)} placeholder="Dato grande (ej. Toda Colombia)" />
+            <input value={t} onChange={(e) => setRow('heroStats', i, 1, e.target.value)} placeholder="Texto pequeño" />
+            <button className="ad-btn sm danger" onClick={() => setS({ ...s, heroStats: s.heroStats.filter((_, j) => j !== i) })}>Quitar</button>
           </div>
         ))}
-        <button className="ad-btn sm" onClick={() => setS({ ...s, coupons: [...s.coupons, { code: '', pct: 10 }] })}>+ Agregar cupón</button>
+        {(s.heroStats || []).length < 4 && <button className="ad-btn sm" onClick={() => setS({ ...s, heroStats: [...(s.heroStats || []), ['', '']] })}>+ Agregar cifra</button>}
+      </Section>
+
+      <Section title="Franja de confianza" hint="Los cuadros con icono que salen debajo de la portada (ej. Envíos, Asesoría…).">
+        {(s.trust || []).map(([i2, t, d], i) => (
+          <div className="ad-row trust" key={i}>
+            <input value={i2} onChange={(e) => setRow('trust', i, 0, e.target.value)} placeholder="Icono" />
+            <input value={t} onChange={(e) => setRow('trust', i, 1, e.target.value)} placeholder="Título" />
+            <input value={d} onChange={(e) => setRow('trust', i, 2, e.target.value)} placeholder="Texto pequeño" />
+            <button className="ad-btn sm danger" onClick={() => setS({ ...s, trust: s.trust.filter((_, j) => j !== i) })}>Quitar</button>
+          </div>
+        ))}
+        {(s.trust || []).length < 4 && <button className="ad-btn sm" onClick={() => setS({ ...s, trust: [...(s.trust || []), ['✔', '', '']] })}>+ Agregar cuadro</button>}
+      </Section>
+
+      <Section title="Sección “Nosotros”" hint="En el título, una palabra entre *asteriscos* sale destacada.">
+        <label>Texto pequeño superior<input value={s.aboutEyebrow} onChange={set('aboutEyebrow')} /></label>
+        <label>Título<textarea rows="2" value={s.aboutTitle} onChange={set('aboutTitle')} /></label>
+        <label>Descripción<textarea rows="3" value={s.aboutText} onChange={set('aboutText')} /></label>
+        <b>Puntos de la lista</b>
+        {(s.aboutChecks || []).map((c, i) => (
+          <div className="ad-row pair" key={i}>
+            <input value={c} onChange={(e) => setCheck(i, e.target.value)} />
+            <button className="ad-btn sm danger" onClick={() => setS({ ...s, aboutChecks: s.aboutChecks.filter((_, j) => j !== i) })}>Quitar</button>
+          </div>
+        ))}
+        <button className="ad-btn sm" onClick={() => setS({ ...s, aboutChecks: [...(s.aboutChecks || []), ''] })}>+ Agregar punto</button>
+        <label>Texto del botón<input value={s.aboutButton} onChange={set('aboutButton')} /></label>
+      </Section>
+
+      <Section title="Cierre y pie de página">
+        <div className="ad-row">
+          <label>Título final<input value={s.ctaTitle} onChange={set('ctaTitle')} /></label>
+          <label>Texto del botón final<input value={s.ctaButton} onChange={set('ctaButton')} /></label>
+        </div>
+        <label>Texto del pie de página<textarea rows="2" value={s.footerText} onChange={set('footerText')} /></label>
       </Section>
 
       <Section title="Contacto y redes">

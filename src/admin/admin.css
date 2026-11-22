@@ -175,3 +175,12 @@
 .ad-login form{background:#fff;border-color:var(--gold);box-shadow:0 30px 70px -30px rgba(0,0,0,.25)}
 .ad-login input{background:#fff;border-color:#d5d8de;color:#111}
 .ad-demo{color:#b9770e}
+/* ---- Admin: filas nuevas ---- */
+.ad-row.c3{grid-template-columns:1fr 1fr 1fr}
+.ad-row.pair{grid-template-columns:1fr 1fr auto;align-items:center}
+.ad-row.trust{grid-template-columns:70px 1fr 1fr auto;align-items:center}
+.ad-row.pair:has(> input:only-of-type){grid-template-columns:1fr auto}
+.ad label small{text-transform:none;letter-spacing:0;font-weight:500;opacity:.7}
+@media(max-width:700px){
+  .ad-row.c3,.ad-row.pair,.ad-row.trust{grid-template-columns:1fr}
+}

@@ -89,8 +89,56 @@ export async function saveData(data) {
   return clean
 }
 
+// Quita el fondo liso (blanco, gris, negro…) que toca los bordes de la foto y lo deja transparente.
+// Devuelve false (sin tocar la imagen) si la foto no tiene un fondo parejo.
+function cutBackground(c) {
+  const w = c.width
+  const h = c.height
+  const ctx = c.getContext('2d', { willReadFrequently: true })
+  const img = ctx.getImageData(0, 0, w, h)
+  const px = img.data
+  const at = (x, y) => (y * w + x) * 4
+  const corners = [at(0, 0), at(w - 1, 0), at(0, h - 1), at(w - 1, h - 1)]
+  if (corners.some((i) => px[i + 3] < 250)) return false // ya es transparente
+  const bg = [0, 1, 2].map((ch) => corners.reduce((a, i) => a + px[i + ch], 0) / 4)
+  if (corners.some((i) => [0, 1, 2].some((ch) => Math.abs(px[i + ch] - bg[ch]) > 30))) return false // fondo no parejo
+  const dist = (i) => Math.hypot(px[i] - bg[0], px[i + 1] - bg[1], px[i + 2] - bg[2])
+  const TOL = 48
+  const seen = new Uint8Array(w * h)
+  const stack = []
+  const push = (x, y) => { const p = y * w + x; if (!seen[p] && dist(p * 4) < TOL) { seen[p] = 1; stack.push(p) } }
+  for (let x = 0; x < w; x++) { push(x, 0); push(x, h - 1) }
+  for (let y = 0; y < h; y++) { push(0, y); push(w - 1, y) }
+  let removed = 0
+  while (stack.length) {
+    const p = stack.pop()
+    px[p * 4 + 3] = 0
+    removed++
+    const x = p % w
+    const y = (p / w) | 0
+    if (x > 0) push(x - 1, y)
+    if (x < w - 1) push(x + 1, y)
+    if (y > 0) push(x, y - 1)
+    if (y < h - 1) push(x, y + 1)
+  }
+  const share = removed / (w * h)
+  if (share < 0.04 || share > 0.92) return false // no parece haber un fondo que quitar
+  // Bordes suaves: los píxeles pegados al fondo se vuelven semitransparentes según qué tan parecidos son al fondo.
+  for (let y = 1; y < h - 1; y++) {
+    for (let x = 1; x < w - 1; x++) {
+      const p = y * w + x
+      if (seen[p]) continue
+      if (!(seen[p - 1] || seen[p + 1] || seen[p - w] || seen[p + w])) continue
+      const d = dist(p * 4)
+      if (d < TOL * 1.7) px[p * 4 + 3] = Math.round(255 * Math.min(1, (d - TOL * 0.4) / (TOL * 1.3)))
+    }
+  }
+  ctx.putImageData(img, 0, 0)
+  return true
+}
+
 // Reduce la foto (máx. 900 px) para que cargue rápido.
-function shrink(file, max = 900, quality = 0.85) {
+function shrink(file, max = 900, quality = 0.85, cut = false) {
   return new Promise((resolve, reject) => {
     const img = new Image()
     const u = URL.createObjectURL(file)
@@ -99,9 +147,9 @@ function shrink(file, max = 900, quality = 0.85) {
       const c = document.createElement('canvas')
       c.width = Math.round(img.width * k)
       c.height = Math.round(img.height * k)
-      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height)
+      c.getContext('2d', { willReadFrequently: true }).drawImage(img, 0, 0, c.width, c.height)
       URL.revokeObjectURL(u)
-      const png = file.type === 'image/png'
+      const png = file.type === 'image/png' || (cut && cutBackground(c))
       c.toBlob((b) => (b ? resolve({ blob: b, ext: png ? 'png' : 'jpg' }) : reject(new Error('Imagen no válida'))), png ? 'image/png' : 'image/jpeg', quality)
     }
     img.onerror = () => reject(new Error('No se pudo leer la imagen'))
@@ -112,8 +160,8 @@ function shrink(file, max = 900, quality = 0.85) {
 const toDataUrl = (blob) => new Promise((res) => { const f = new FileReader(); f.onload = () => res(f.result); f.readAsDataURL(blob) })
 
 // Devuelve la URL (o dataURL en modo demo) de la foto subida.
-export async function uploadImage(file) {
-  const { blob, ext } = await shrink(file)
+export async function uploadImage(file, { cutout = false } = {}) {
+  const { blob, ext } = await shrink(file, 900, 0.85, cutout)
   if (!CLOUD) return toDataUrl(blob)
   const s = auth()
   const name = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`

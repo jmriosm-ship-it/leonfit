@@ -17,6 +17,21 @@ const SETTINGS = {
   flashCount: 4,
   combosTitle: 'Combos con descuento extra',
   schedule: 'Lun–Sáb 9am–5pm · Festivos 9am–12pm',
+  heroStats: [['Toda Colombia', 'envíos nacionales'], ['100%', 'originales'], ['L–S', '9am a 5pm']],
+  trust: [
+    ['✔', 'Productos originales', 'Directo de proveedores'],
+    ['🚚', 'Envíos a todo el país', 'Por transportadora'],
+    ['💬', 'Asesoría por WhatsApp', 'Te guiamos según tu meta'],
+    ['🔒', 'Compra segura', 'Pago confirmado contigo'],
+  ],
+  aboutEyebrow: 'Por qué LeonFit',
+  aboutTitle: 'Entrena, rinde\ny *destaca*.',
+  aboutText: 'Somos una tienda de suplementación y moda deportiva. Te asesoramos para que elijas lo que realmente necesitas para entrenar, rendir y destacar.',
+  aboutChecks: ['Asesoría personalizada por WhatsApp', 'Envíos a toda Colombia', 'Pagos por Nequi, Credicervir y Bancolombia', 'Atención de lunes a sábado'],
+  aboutButton: 'Hablar con un asesor',
+  ctaTitle: '¿Listo para tu próximo nivel?',
+  ctaButton: 'Ir a la tienda',
+  footerText: 'LeonFit — Sports Supplement Store.\nSuplementación y moda deportiva.',
   faq: [
     ['¿A qué ciudades envían?', 'Enviamos a toda Colombia por transportadora. Te confirmamos el tiempo y el costo del envío antes de que pagues.'],
     ['¿Cómo hago mi pedido y cómo pago?', 'Armas tu carrito, llenas tus datos de entrega y te llega el pedido listo a nuestro WhatsApp. Allí confirmamos disponibilidad y el pago por Nequi, Credicervir o Bancolombia.'],
@@ -25,14 +40,7 @@ const SETTINGS = {
   ],
 }
 
-const CATEGORIES = [
-  { id: 'proteinas', name: 'Proteínas', tag: 'Músculo' },
-  { id: 'creatina', name: 'Creatina', tag: 'Fuerza' },
-  { id: 'preentreno', name: 'Pre-entreno', tag: 'Energía' },
-  { id: 'aminoacidos', name: 'Aminoácidos', tag: 'Recuperación' },
-  { id: 'quemadores', name: 'Quemadores', tag: 'Definición' },
-  { id: 'vitaminas', name: 'Vitaminas', tag: 'Bienestar' },
-]
+const CATEGORIES = []
 
 // color = acento del empaque, label = texto corto en el pote
 const PRODUCTS = []
