@@ -8,7 +8,10 @@ import { DataProvider } from './DataContext.jsx'
 // El panel se descarga solo cuando entras a #/admin.
 const Admin = lazy(() => import('./admin/Admin.jsx'))
 
+const Diag = lazy(() => import('./Diag.jsx'))
+
 const isAdmin = () => window.location.hash.startsWith('#/admin')
+const isDiag = () => window.location.hash.startsWith('#/diagnostico')
 
 // Si la pestaña quedó abierta con una versión vieja y el archivo del panel ya no existe
 // (después de publicar una actualización), recarga una sola vez para traer la versión nueva.
@@ -65,16 +68,17 @@ class Guard extends Component {
 
 function Root() {
   const [admin, setAdmin] = useState(isAdmin)
+  const [diag, setDiag] = useState(isDiag)
   useEffect(() => {
-    const on = () => setAdmin(isAdmin())
+    const on = () => { setAdmin(isAdmin()); setDiag(isDiag()) }
     window.addEventListener('hashchange', on)
     return () => window.removeEventListener('hashchange', on)
   }, [])
   return (
     <Guard>
-      <DataProvider>
+      {diag ? <Suspense fallback={<p style={{ padding: 40 }}>Cargando diagnóstico…</p>}><Diag /></Suspense> : <DataProvider>
         {admin ? <Suspense fallback={<p style={{ padding: 40 }}>Cargando panel…</p>}><Admin /></Suspense> : <App />}
-      </DataProvider>
+      </DataProvider>}
     </Guard>
   )
 }
