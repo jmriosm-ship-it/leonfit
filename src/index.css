@@ -369,3 +369,12 @@ details p{color:var(--mut);margin-top:12px}
 .badge.sold{background:#333;color:#ddd}
 .btn-add:disabled{opacity:.45;cursor:not-allowed}
 .ok{color:var(--ok)}.no{color:#ff7a72}
+
+/* ---- Páginas legales ---- */
+.legal{max-width:820px;margin:0 auto;padding:30px 4vw 90px}
+.legal h1{font-size:clamp(28px,4vw,42px);margin:10px 0 18px;text-transform:uppercase}
+.legal-tabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:26px}
+.legal-tabs a{padding:8px 16px;border:1px solid var(--line);border-radius:99px;font:700 13px var(--fn);letter-spacing:.05em;color:var(--mut)}
+.legal-tabs a.on{background:var(--gold);color:#111;border-color:var(--gold)}
+.legal h2{font-size:19px;margin:26px 0 8px}
+.legal p{color:var(--mut);margin-bottom:10px;line-height:1.7}

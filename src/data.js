@@ -3,7 +3,7 @@
 const SETTINGS = {
   whatsapp: '573214580943',
   instagram: 'https://www.instagram.com/leonfit_suplementos/',
-  tiktok: '',
+  tiktok: 'https://www.tiktok.com/@leonfit_suplementos',
   freeShipping: 180000,
   coupons: [{ code: 'LEON10', pct: 10 }, { code: 'FIT15', pct: 15 }],
   announcement: 'ENVÍO GRATIS EN COMPRAS DESDE {envio} • USA EL CUPÓN LEON10 Y ACUMULA 10% OFF • PRODUCTOS 100% ORIGINALES • COMBOS CON HASTA 18% OFF',
@@ -16,7 +16,7 @@ const SETTINGS = {
   flashTitle: 'Se acaba hoy',
   flashCount: 4,
   combosTitle: 'Combos con descuento extra',
-  schedule: 'Lun–Sáb · 8am–7pm',
+  schedule: 'Lun–Sáb 9am–5pm · Festivos 9am–12pm',
   faq: [
     ['¿Los productos son originales?', 'Sí. Trabajamos solo con proveedores autorizados y todos los productos tienen registro sanitario y lote verificable.'],
     ['¿Cuánto tarda el envío?', 'En la ciudad entregamos el mismo día o al siguiente. A nivel nacional de 2 a 5 días hábiles.'],

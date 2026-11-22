@@ -1,40 +1,19 @@
 import { useEffect, useState } from 'react'
 import ProductArt from './ProductArt.jsx'
-import { CAT_INFO, GENERIC_INFO, getReviews, money, pct, ratingBars } from '../data.js'
+import { money, pct } from '../data.js'
 import { useData } from '../DataContext.jsx'
-
-const stars = (n) => '★'.repeat(n) + '☆'.repeat(5 - n)
 
 export default function ProductPage({ p, onAdd, onBack, onOpen, onCategory }) {
   const { categories: CATEGORIES, products: PRODUCTS, settings } = useData()
   const [qty, setQty] = useState(1)
-  const [tab, setTab] = useState('desc')
-  const [mine, setMine] = useState([])
-  const [form, setForm] = useState({ name: '', rating: 5, text: '' })
-  const key = `leonfit-reviews-${p.id}`
-  const info = CAT_INFO[p.cat] || GENERIC_INFO
   const cat = CATEGORIES.find((c) => c.id === p.cat)
   const off = pct(p)
-  const reviews = [...mine, ...getReviews(p)]
-  const total = p.reviews + mine.length
   const related = PRODUCTS.filter((x) => x.cat === p.cat && x.id !== p.id).concat(PRODUCTS.filter((x) => x.cat !== p.cat && x.id !== p.id)).slice(0, 4)
 
   useEffect(() => {
     setQty(1)
-    setTab('desc')
-    try { setMine(JSON.parse(localStorage.getItem(key)) || []) } catch { setMine([]) }
     window.scrollTo({ top: 0 })
   }, [p.id])
-
-  const submit = (e) => {
-    e.preventDefault()
-    if (!form.name.trim() || !form.text.trim()) return
-    const r = { name: form.name.trim(), rating: Number(form.rating), text: form.text.trim(), when: 'justo ahora', verified: false }
-    const next = [r, ...mine]
-    setMine(next)
-    try { localStorage.setItem(key, JSON.stringify(next)) } catch { /* sin storage */ }
-    setForm({ name: '', rating: 5, text: '' })
-  }
 
   const buyNow = () => {
     const msg = `Hola LeonFit 🦁, quiero comprar:\n\n• ${qty}x ${p.name} (${p.flavor}) — ${money(p.price * qty)}\n\n¿Está disponible?`
@@ -56,11 +35,6 @@ export default function ProductPage({ p, onAdd, onBack, onOpen, onCategory }) {
         <div className="pp-info">
           <small className="pp-brand">{p.brand} · {cat?.name}</small>
           <h1>{p.name}</h1>
-          <div className="pp-rate">
-            <span className="stars">{stars(Math.round(p.rating))}</span> <b>{p.rating}</b>
-            <a onClick={() => { setTab('rev'); document.getElementById('pp-tabs')?.scrollIntoView({ behavior: 'smooth' }) }}>{total} reseñas</a>
-          </div>
-
           <div className="pp-price">
             <strong>{money(p.price)}</strong>
             {p.old && <s>{money(p.old)}</s>}
@@ -94,77 +68,11 @@ export default function ProductPage({ p, onAdd, onBack, onOpen, onCategory }) {
       </section>
 
       <section className="pp-tabs" id="pp-tabs">
-        <div className="chips">
-          {[['desc', 'Descripción'], ['nut', 'Información nutricional'], ['use', 'Modo de uso'], ['rev', `Reseñas (${total})`]].map(([id, n]) => (
-            <button key={id} className={tab === id ? 'chip on' : 'chip'} onClick={() => setTab(id)}>{n}</button>
-          ))}
+        <div className="pp-panel">
+          <h3>Sobre {p.name}</h3>
+          <p>{p.desc || 'Escríbenos por WhatsApp y te damos todos los detalles de este producto.'}</p>
+          <small className="note">Revisa siempre la etiqueta del producto. Los suplementos no sustituyen una dieta equilibrada; consulta a tu médico si tienes alguna condición.</small>
         </div>
-
-        {tab === 'desc' && (
-          <div className="pp-panel">
-            <h3>Sobre {p.name}</h3>
-            <p>{p.desc} Presentación de {p.size} con {p.servings} servicios, sabor {p.flavor}.</p>
-            <ul className="checks">{info.benefits.map((b) => <li key={b}>{b}</li>)}</ul>
-          </div>
-        )}
-
-        {tab === 'nut' && (
-          <div className="pp-panel">
-            <h3>Información nutricional</h3>
-            <table className="nut">
-              <thead><tr><th>Por servicio</th><th>Cantidad</th></tr></thead>
-              <tbody>{info.nutrition.map(([a, b]) => <tr key={a}><td>{a}</td><td>{b}</td></tr>)}</tbody>
-            </table>
-            <small className="note">Valores de ejemplo. Revisa siempre la etiqueta del producto.</small>
-          </div>
-        )}
-
-        {tab === 'use' && (
-          <div className="pp-panel">
-            <h3>Modo de uso</h3>
-            <p>{info.usage}</p>
-            <small className="note">Los suplementos no reemplazan una dieta equilibrada. Consulta a tu médico si estás embarazada, lactando o tienes alguna condición.</small>
-          </div>
-        )}
-
-        {tab === 'rev' && (
-          <div className="pp-panel reviews">
-            <div className="rev-sum">
-              <div className="rev-score"><b>{p.rating}</b><span className="stars">{stars(Math.round(p.rating))}</span><small>{total} reseñas</small></div>
-              <div className="rev-bars">
-                {ratingBars(p.rating).map(([n, v]) => (
-                  <div key={n}><span>{n}★</span><i><u style={{ width: v * 100 + '%' }} /></i><em>{Math.round(v * 100)}%</em></div>
-                ))}
-              </div>
-            </div>
-
-            <form className="rev-form" onSubmit={submit}>
-              <h3>Escribe tu reseña</h3>
-              <div className="rev-row">
-                <input placeholder="Tu nombre" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-                <select value={form.rating} onChange={(e) => setForm({ ...form, rating: e.target.value })} aria-label="Calificación">
-                  {[5, 4, 3, 2, 1].map((n) => <option key={n} value={n}>{stars(n)}</option>)}
-                </select>
-              </div>
-              <textarea rows="3" placeholder="Cuéntanos qué tal te fue con el producto" value={form.text} onChange={(e) => setForm({ ...form, text: e.target.value })} />
-              <button className="btn-add" type="submit">Publicar reseña</button>
-            </form>
-
-            <div className="rev-list">
-              {reviews.map((r, i) => (
-                <article key={i} className="rev">
-                  <header>
-                    <b>{r.name}</b>
-                    {r.verified && <span className="ver">✔ Compra verificada</span>}
-                    <small>{r.when}</small>
-                  </header>
-                  <span className="stars">{stars(r.rating)}</span>
-                  <p>{r.text}</p>
-                </article>
-              ))}
-            </div>
-          </div>
-        )}
       </section>
 
       <section className="pp-related">

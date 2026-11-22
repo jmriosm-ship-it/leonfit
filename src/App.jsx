@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import ProductArt from './components/ProductArt.jsx'
 import ProductPage from './components/ProductPage.jsx'
 import { Socials } from './components/Icons.jsx'
+import LegalPage from './components/LegalPage.jsx'
+import { LEGAL } from './legal.js'
 import { money, pct } from './data.js'
 import { useData } from './DataContext.jsx'
 
@@ -44,7 +46,7 @@ function Card({ p, onAdd, onOpen }) {
         <small>{p.brand} · {p.size}</small>
         <h3>{p.name}</h3>
         <p className="flavor">{p.flavor}</p>
-        <Stars value={p.rating} />
+        {p.reviews > 0 && <Stars value={p.rating} />}
         <div className="price-row">
           <div>
             <strong>{money(p.price)}</strong>
@@ -82,6 +84,8 @@ export default function App() {
   const [sort, setSort] = useState('popular')
   const [q, setQ] = useState('')
   const readRoute = () => {
+    const lg = window.location.hash.match(/^#\/(terminos|privacidad)/)
+    if (lg) return { page: 'legal', kind: lg[1] }
     const m = window.location.hash.match(/^#\/(producto|categoria)\/([\w-]+)/)
     if (!m) return { page: 'home' }
     if (m[1] === 'producto') {
@@ -226,7 +230,9 @@ export default function App() {
         </nav>
       </header>
 
-      {route.page === 'prod' ? (
+      {route.page === 'legal' ? (
+        <main id="top"><LegalPage kind={route.kind} onBack={() => go('top')} /></main>
+      ) : route.page === 'prod' ? (
         <main id="top">
           <ProductPage p={route.p} onAdd={(p, n) => { add(p, n); setOpen(true) }} onBack={() => go('top')} onOpen={setDetail} onCategory={filterTo} />
         </main>
@@ -266,9 +272,9 @@ export default function App() {
               <button className="btn-line" onClick={() => filterTo('ofertas')}>Ver ofertas{maxOff ? ` -${maxOff}%` : ''}</button>
             </div>
             <ul className="hero-stats">
-              <li><b>+1.500</b>clientes felices</li>
+              <li><b>Toda Colombia</b>envíos nacionales</li>
               <li><b>100%</b>originales</li>
-              <li><b>24 h</b>despacho</li>
+              <li><b>L–S</b>9am a 5pm</li>
             </ul>
           </div>
           <div className="hero-art">
@@ -409,12 +415,12 @@ export default function App() {
       <footer className="footer">
         <div>
           <img src={`${import.meta.env.BASE_URL}logo.jpg`} alt="" />
-          <p>LeonFit — Sports Supplement Store.<br />Tu tienda de suplementos deportivos.</p>
+          <p>LeonFit — Sports Supplement Store.<br />Suplementación y moda deportiva.</p>
         </div>
         <div><b>Tienda</b>{CATEGORIES.slice(0, 4).map((c) => <a key={c.id} onClick={() => filterTo(c.id)}>{c.name}</a>)}</div>
-        <div><b>Ayuda</b><a onClick={() => go('faq')}>Preguntas</a><a onClick={() => go('combos')}>Combos</a><a onClick={() => go('nosotros')}>Nosotros</a></div>
+        <div><b>Ayuda</b><a onClick={() => go('faq')}>Preguntas</a><a onClick={() => go('combos')}>Combos</a><a onClick={() => go('nosotros')}>Nosotros</a><a href="#/terminos">Términos y condiciones</a><a href="#/privacidad">Política de privacidad</a></div>
         <div><b>Contacto</b><a href={`https://wa.me/${WHATSAPP}`} target="_blank" rel="noreferrer">WhatsApp: {phone}</a>{igHandle && <a href={settings.instagram} target="_blank" rel="noreferrer">Instagram: @{igHandle}</a>}<a>{settings.schedule}</a><Socials /></div>
-        <small>© {new Date().getFullYear()} LeonFit. Los suplementos no sustituyen una dieta equilibrada. Consulta a tu médico.</small>
+        <small>© {new Date().getFullYear()} {LEGAL.brand} · {LEGAL.owner} · {LEGAL.idType} {LEGAL.id}. Los suplementos no sustituyen una dieta equilibrada. Consulta a tu médico.</small>
       </footer>
 
       <Socials className="float" />
