@@ -23,6 +23,22 @@ const reloadOnce = () => {
 window.addEventListener('vite:preloadError', (e) => { e.preventDefault(); reloadOnce() })
 window.addEventListener('load', () => setTimeout(() => { try { sessionStorage.removeItem('leonfit-reloaded') } catch { /* sin storage */ } }, 4000))
 
+// Cualquier error de JavaScript se muestra en una franja roja arriba (con la versión del sitio).
+const showFatal = (msg) => {
+  if (/ResizeObserver/i.test(msg)) return
+  let box = document.getElementById('fatal')
+  if (!box) {
+    box = document.createElement('div')
+    box.id = 'fatal'
+    box.style.cssText = 'position:fixed;left:0;right:0;top:0;z-index:99999;background:#b91c1c;color:#fff;padding:10px 14px;font:13px/1.4 system-ui;white-space:pre-wrap;word-break:break-word'
+    document.body.appendChild(box)
+  }
+  box.textContent = 'Error: ' + msg + '  [versión ' + __BUILD__ + ']'
+}
+window.addEventListener('error', (e) => showFatal(String(e.message || e.error)))
+window.addEventListener('unhandledrejection', (e) => showFatal(String(e.reason?.message || e.reason)))
+console.info('LeonFit versión', __BUILD__)
+
 // En vez de dejar la pantalla en blanco, muestra qué falló y cómo arreglarlo.
 class Guard extends Component {
   state = { error: null }
