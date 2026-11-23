@@ -149,7 +149,8 @@ function shrink(file, max = 1600, quality = 0.92, cut = false) {
       c.height = Math.round(img.height * k)
       c.getContext('2d', { willReadFrequently: true }).drawImage(img, 0, 0, c.width, c.height)
       URL.revokeObjectURL(u)
-      const png = file.type === 'image/png' || (cut && cutBackground(c))
+      const cutDone = cut && cutBackground(c)
+      const png = cutDone || file.type === 'image/png'
       c.toBlob((b) => (b ? resolve({ blob: b, ext: png ? 'png' : 'jpg' }) : reject(new Error('Imagen no válida'))), png ? 'image/png' : 'image/jpeg', quality)
     }
     img.onerror = () => reject(new Error('No se pudo leer la imagen'))
@@ -161,7 +162,7 @@ const toDataUrl = (blob) => new Promise((res) => { const f = new FileReader(); f
 
 // Devuelve la URL (o dataURL en modo demo) de la foto subida.
 export async function uploadImage(file, { cutout = false } = {}) {
-  const { blob, ext } = await shrink(file, 900, 0.85, cutout)
+  const { blob, ext } = await shrink(file, 1600, 0.92, cutout)
   if (!CLOUD) return toDataUrl(blob)
   const s = auth()
   const name = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
