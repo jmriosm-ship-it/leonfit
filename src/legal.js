@@ -10,8 +10,8 @@ export const LEGAL = {
   instagram: '@Leonfit_suplementos',
   tiktok: '@Leonfit_suplementos',
   site: 'leonfitt.com',
-  payments: 'Nequi, Credicervir y Bancolombia',
-  paymentList: ['Nequi', 'Credicervir', 'Bancolombia'],
+  payments: 'Nequi, Crediservir y Bancolombia',
+  paymentList: ['Nequi', 'Crediservir', 'Bancolombia'],
   schedule: 'lunes a sábado de 9:00 a. m. a 5:00 p. m.; domingos sin servicio; festivos de 9:00 a. m. a 12:00 m.',
   updated: 'noviembre de 2026',
 }
