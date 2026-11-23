@@ -89,21 +89,33 @@ export async function saveData(data) {
   return clean
 }
 
-// Quita el fondo liso (blanco, gris, negro…) que toca los bordes de la foto y lo deja transparente.
-// Devuelve false (sin tocar la imagen) si la foto no tiene un fondo parejo.
-function cutBackground(c) {
+// Quita el fondo de la foto: toma los colores que dominan los bordes (blanco, gris, negro, degradados…)
+// y borra todo lo que, partiendo de los bordes, se parezca a ellos. Luego recorta los márgenes vacíos.
+// Devuelve false (sin tocar la imagen) si los bordes no tienen un fondo claro que quitar.
+export function cutBackground(c) {
   const w = c.width
   const h = c.height
   const ctx = c.getContext('2d', { willReadFrequently: true })
   const img = ctx.getImageData(0, 0, w, h)
   const px = img.data
   const at = (x, y) => (y * w + x) * 4
-  const corners = [at(0, 0), at(w - 1, 0), at(0, h - 1), at(w - 1, h - 1)]
-  if (corners.some((i) => px[i + 3] < 250)) return false // ya es transparente
-  const bg = [0, 1, 2].map((ch) => corners.reduce((a, i) => a + px[i + ch], 0) / 4)
-  if (corners.some((i) => [0, 1, 2].some((ch) => Math.abs(px[i + ch] - bg[ch]) > 30))) return false // fondo no parejo
-  const dist = (i) => Math.hypot(px[i] - bg[0], px[i + 1] - bg[1], px[i + 2] - bg[2])
-  const TOL = 48
+  const edge = []
+  for (let x = 0; x < w; x++) { edge.push(at(x, 0), at(x, h - 1)) }
+  for (let y = 1; y < h - 1; y++) { edge.push(at(0, y), at(w - 1, y)) }
+  if (edge.filter((i) => px[i + 3] < 250).length > edge.length * 0.5) return false // ya es transparente
+  // Paleta del fondo: los colores (agrupados en cubos de 16) que más se repiten en el borde.
+  const bins = new Map()
+  for (const i of edge) {
+    const k = (px[i] >> 4) * 256 + (px[i + 1] >> 4) * 16 + (px[i + 2] >> 4)
+    const b = bins.get(k) || [0, 0, 0, 0]
+    b[0]++; b[1] += px[i]; b[2] += px[i + 1]; b[3] += px[i + 2]
+    bins.set(k, b)
+  }
+  const pal = [...bins.values()].filter((b) => b[0] >= edge.length * 0.03).sort((a, b) => b[0] - a[0]).slice(0, 8).map((b) => [b[1] / b[0], b[2] / b[0], b[3] / b[0]])
+  const covered = [...bins.values()].filter((b) => b[0] >= edge.length * 0.03).reduce((a, b) => a + b[0], 0)
+  if (!pal.length || covered < edge.length * 0.6) return false // el borde tiene demasiados colores: no hay fondo parejo
+  const dist = (i) => { let m = 1e9; for (const p of pal) { const d = Math.hypot(px[i] - p[0], px[i + 1] - p[1], px[i + 2] - p[2]); if (d < m) m = d } return m }
+  const TOL = 44
   const seen = new Uint8Array(w * h)
   const stack = []
   const push = (x, y) => { const p = y * w + x; if (!seen[p] && dist(p * 4) < TOL) { seen[p] = 1; stack.push(p) } }
@@ -133,7 +145,20 @@ function cutBackground(c) {
       if (d < TOL * 1.7) px[p * 4 + 3] = Math.round(255 * Math.min(1, (d - TOL * 0.4) / (TOL * 1.3)))
     }
   }
+  // Recorte: caja que rodea lo que quedó visible, con un pequeño margen.
+  let x0 = w, y0 = h, x1 = 0, y1 = 0
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (px[at(x, y) + 3] > 30) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y }
   ctx.putImageData(img, 0, 0)
+  if (x1 > x0 && y1 > y0) {
+    const m = Math.round(Math.max(x1 - x0, y1 - y0) * 0.03)
+    x0 = Math.max(0, x0 - m); y0 = Math.max(0, y0 - m); x1 = Math.min(w - 1, x1 + m); y1 = Math.min(h - 1, y1 + m)
+    const cw = x1 - x0 + 1
+    const ch = y1 - y0 + 1
+    const data = ctx.getImageData(x0, y0, cw, ch)
+    c.width = cw
+    c.height = ch
+    c.getContext('2d').putImageData(data, 0, 0)
+  }
   return true
 }
 
