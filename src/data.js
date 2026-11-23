@@ -7,7 +7,7 @@ const SETTINGS = {
   freeShipping: 0, // 0 = sin envío gratis (se cambia en el panel)
   coupons: [],
   announcement: 'ENVÍOS A TODA COLOMBIA • PIDE POR WHATSAPP • ASESORÍA PERSONALIZADA',
-  heroEyebrow: 'Sports Supplement Store',
+  heroEyebrow: 'Suplementos que rugen contigo',
   heroTitle: 'Despierta\nal *león*\nque llevas dentro.',
   heroText: 'Proteínas, creatina y pre-entrenos 100% originales con descuentos que sí se notan. Pide por WhatsApp y recibe en casa.',
   heroTag: '',
