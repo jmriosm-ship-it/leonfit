@@ -138,7 +138,7 @@ function cutBackground(c) {
 }
 
 // Reduce la foto (máx. 900 px) para que cargue rápido.
-function shrink(file, max = 900, quality = 0.85, cut = false) {
+function shrink(file, max = 1600, quality = 0.92, cut = false) {
   return new Promise((resolve, reject) => {
     const img = new Image()
     const u = URL.createObjectURL(file)
