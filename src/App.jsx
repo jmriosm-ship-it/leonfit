@@ -336,8 +336,9 @@ export default function App() {
               const items = PRODUCTS.filter((p) => p.cat === c.id)
               const top = items[0]
               return (
-                <button key={c.id} className="bigcat" onClick={() => filterTo(c.id)} style={{ '--c': top.color }}>
-                  <div className="bigcat-art"><ProductArt color={top.color} label={top.label} size={top.size} name={c.name} image={top.image} /></div>
+                <button key={c.id} className={`bigcat${c.image ? ' has-cover' : ''}`} onClick={() => filterTo(c.id)} style={{ '--c': top.color }}>
+                  {c.image && <img className="bigcat-cover" src={c.image} alt={c.name} loading="lazy" />}
+                  {!c.image && <div className="bigcat-art"><ProductArt color={top.color} label={top.label} size={top.size} name={c.name} image={top.image} /></div>}
                   <div className="bigcat-info">
                     <em>0{i + 1}</em>
                     <small>{c.tag}</small>

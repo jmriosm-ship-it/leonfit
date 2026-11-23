@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { uploadImage } from '../store.js'
 
 const slug = (t) => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 
@@ -6,6 +7,7 @@ export default function CategoriesTab({ store, commit, notify }) {
   const { categories, products } = store
   const [form, setForm] = useState({ name: '', tag: '' })
   const [editId, setEditId] = useState(null)
+  const [busy, setBusy] = useState(null)
 
   const count = (id) => products.filter((p) => p.cat === id).length
 
@@ -20,6 +22,13 @@ export default function CategoriesTab({ store, commit, notify }) {
   }
 
   const update = (id, change) => commit((d) => ({ ...d, categories: d.categories.map((c) => (c.id === id ? { ...c, ...change } : c)) }), 'Categoría actualizada ✔')
+
+  const setCover = async (c, file) => {
+    if (!file) return
+    setBusy(c.id)
+    try { const url = await uploadImage(file); await update(c.id, { image: url }) } catch (x) { notify(x.message, true) }
+    setBusy(null)
+  }
 
   const move = (i, dir) => {
     const j = i + dir
@@ -38,7 +47,7 @@ export default function CategoriesTab({ store, commit, notify }) {
 
   return (
     <>
-      <div className="lfa-bar"><div><h2>Categorías <small>({categories.length})</small></h2><p className="lfa-sub">Aparecen en el menú y en “Elige tu categoría”. El orden de aquí es el de la tienda.</p></div></div>
+      <div className="lfa-bar"><div><h2>Categorías <small>({categories.length})</small></h2><p className="lfa-sub">Aparecen en el menú y en “Elige tu categoría”. El orden de aquí es el de la tienda. La foto de portada es opcional: si no la pones, se usa la foto del primer producto.</p></div></div>
 
       <form className="lfa-card lfa-inline" onSubmit={add}>
         <label>Nueva categoría<input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Ej. Ropa deportiva" /></label>
@@ -48,12 +57,22 @@ export default function CategoriesTab({ store, commit, notify }) {
 
       <div className="lfa-card lfa-tablewrap">
         <table className="lfa-table">
-          <thead><tr><th>#</th><th>Nombre</th><th>Etiqueta</th><th>Productos</th><th></th></tr></thead>
+          <thead><tr><th>#</th><th>Nombre</th><th>Portada</th><th>Etiqueta</th><th>Productos</th><th></th></tr></thead>
           <tbody>
             {categories.map((c, i) => (
               <tr key={c.id}>
                 <td>{i + 1}</td>
                 <td>{editId === c.id ? <input defaultValue={c.name} id={`n-${c.id}`} /> : <b>{c.name}</b>}</td>
+                <td>
+                  <div className="lfa-cover">
+                    {c.image ? <img src={c.image} alt="" /> : <span className="lfa-cover-empty">Sin foto</span>}
+                    <label className="lfa-btn sm">
+                      {busy === c.id ? 'Subiendo…' : c.image ? 'Cambiar' : 'Subir foto'}
+                      <input type="file" accept="image/*" hidden disabled={busy === c.id} onChange={(e) => { setCover(c, e.target.files[0]); e.target.value = '' }} />
+                    </label>
+                    {c.image && <button className="lfa-btn sm danger" onClick={() => update(c.id, { image: '' })}>Quitar</button>}
+                  </div>
+                </td>
                 <td>{editId === c.id ? <input defaultValue={c.tag} id={`t-${c.id}`} /> : c.tag}</td>
                 <td>{count(c.id)}</td>
                 <td className="acts">
@@ -77,7 +96,7 @@ export default function CategoriesTab({ store, commit, notify }) {
                 </td>
               </tr>
             ))}
-            {!categories.length && <tr><td colSpan="5" className="empty">Aún no hay categorías.</td></tr>}
+            {!categories.length && <tr><td colSpan="6" className="empty">Aún no hay categorías.</td></tr>}
           </tbody>
         </table>
       </div>
