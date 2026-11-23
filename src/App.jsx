@@ -253,7 +253,7 @@ export default function App() {
         <main id="top" className="catpage">
           <nav className="crumbs"><a onClick={() => go('top')}>Inicio</a> / <span>{catTitle}</span></nav>
           <div className="head row">
-            <div><span className="eyebrow">{catInfo?.tag || 'Catálogo'}</span><h2>{catTitle}</h2><p className="count">{list.length} productos</p></div>
+            <div><span className="eyebrow">{catInfo?.tag || 'Catálogo'}</span><h2>{catTitle}</h2><p className="count">{list.length} {list.length === 1 ? "producto" : "productos"}</p></div>
             <select value={sort} onChange={(e) => setSort(e.target.value)} aria-label="Ordenar">
               <option value="popular">Más populares</option>
               <option value="desc">Mayor descuento</option>
@@ -342,7 +342,7 @@ export default function App() {
                     <em>0{i + 1}</em>
                     <small>{c.tag}</small>
                     <b>{c.name}</b>
-                    <span>{items.length} productos · Ver todos →</span>
+                    <span>{items.length} {items.length === 1 ? "producto" : "productos"} · Ver todos →</span>
                   </div>
                 </button>
               )
